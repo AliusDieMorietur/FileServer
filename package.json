@@ -1,0 +1,19 @@
+{
+  "name": "fileserver",
+  "version": "0.0.1",
+  "description": "Simple file server dedicated for easily exchange of information between devices.",
+  "main": "./server/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AliusDieMorietur/FileServer.git"
+  },
+  "author": "AliusDieMorietur & gidra5",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AliusDieMorietur/FileServer/issues"
+  },
+  "homepage": "https://github.com/AliusDieMorietur/FileServer#readme"
+}
