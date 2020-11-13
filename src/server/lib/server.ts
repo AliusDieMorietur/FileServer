@@ -1,26 +1,24 @@
 import * as ws from 'ws';
 import * as http from 'http';
-import * as worker_threads from 'worker_threads';
+import { threadId } from 'worker_threads';
 import { serverConfig } from '../config/server';
 import { Client } from './client';
 import { logger } from './logger';
  
-const listener = (req, res) => {
-  const client = new Client(req, res, null);
+const listener = (req: http.IncomingMessage, res) => {
+  const client = new Client({ req, res });
   client.static();
 };
 
-class Server {
-  instance
-  ws
+export class Server {
+  instance = http.createServer(listener);
+  ws = new ws.Server({ server: this.instance });
+
   constructor() {
     const { ports } = serverConfig; 
-    const { threadId } = worker_threads;
-    const port: number = ports[threadId - 1];
-    this.instance = http.createServer(listener);
-    this.ws = new ws.Server({ server: this.instance });
+    const port = ports[threadId - 1];
     this.ws.on('connection', (connection, req) => {
-      const client = new Client(req, null, connection);
+      const client = new Client({ connection, req });
       connection.on('message', (data) => {
         client.message(data);
       })
@@ -32,8 +30,7 @@ class Server {
   }
   
   async close() {
+    //TODO graceful shutdown
     logger.log('close');
   }
 }
-
-export { Server };

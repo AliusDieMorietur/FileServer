@@ -1,7 +1,9 @@
 import * as fs from 'fs';
-import * as util from 'util';
+import { format } from 'util';
 
-const COLORS = {
+type LogLevel = 'info' | 'error' | 'warning' | 'success' | 'ext'
+
+const COLORS: { [k in LogLevel]: string } = {
   info: '\u001b[37m',
   error: '\u001b[31m',
   warning: '\u001b[33m',
@@ -11,48 +13,35 @@ const COLORS = {
 
 const DATETIME_LENGTH = 19;
 
-const log = (color, value) => {
-  console.log();
-};
-
-
 class Logger { 
-  stream
-  constructor() {
-    const date = new Date();
-    this.stream = fs.createWriteStream('./target/logs/log.txt', { flags: 'a' });
-  }
+  private stream = fs.createWriteStream('./target/logs/log.txt', { flags: 'a' })
 
-  write(level, s) {
+  private write(level: LogLevel, ...args: string[]) {
+    const s = format('', ...args);
     const now = new Date().toISOString();
     const date = now.substring(0, DATETIME_LENGTH);
     const color = COLORS[level];
-    const line = date + '\t' + s;
+    const line = date + '\t' + s + '\n';
+
     console.log(color + line + '\x1b[0m');
     this.stream.write(line);
   }
 
-  log(...args) {
-    const msg = util.format('', ...args);
-    this.write('info', msg);
+  log(...args: string[]) {
+    this.write('info', ...args);
   }
 
-  error(...args) {
-    const msg = util.format('', ...args);
-    this.write('error', msg);
+  error(...args: string[]) {
+    this.write('error', ...args);
   }
 
-  success(...args) {
-    const msg = util.format('', ...args);
-    this.write('success', msg);
+  success(...args: string[]) {
+    this.write('success', ...args);
   }
 
-  ext(...args) {
-    const msg = util.format('', ...args);
-    this.write('ext', msg);
+  ext(...args: string[]) {
+    this.write('ext', ...args);
   }
 }
 
-const logger = new Logger();
-
-export { logger };
+export const logger = new Logger();

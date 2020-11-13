@@ -1,23 +1,21 @@
-'use strict';
 import { serverConfig } from '../config/server';
 import { Worker } from 'worker_threads'; 
 
-class App {
-  count: number
-  workers: Array<Worker>
-  constructor() {
-    this.count = serverConfig.ports.length;
-    this.workers = new Array(this.count);
-  }
+export class App {
+  count = serverConfig.ports.length
+  workers: Worker[] = []
   
-  private stop = async () => {
-    for (const worker of this.workers) {
-      worker.postMessage({ name: 'stop' });
+  private stop() {
+    //TODO sudden crash, zaplatka for now
+    if (this.workers) {
+      for (const worker of this.workers) {
+        worker.postMessage({ name: 'stop' });
+      }
     }
     process.exit(0);
   };
 
-  private startWorker = id => {
+  private startWorker(id: number) {
     const worker = new Worker('./target/lib/worker.js');
     this.workers[id] = worker;
     worker.on('exit', code => {
@@ -25,7 +23,7 @@ class App {
     });
   };
 
-  async start () {
+  async start() {
     for (let id = 0; id < this.count; id++) this.startWorker(id);
 
     process.on('SIGINT', this.stop);
@@ -33,5 +31,3 @@ class App {
   }
   
 }
-
-export { App };
