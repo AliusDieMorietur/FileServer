@@ -4,9 +4,9 @@
     "target": "esnext",
     "module": "commonjs",
     "removeComments": true,
-    "outDir": "target",
+    "outDir": "target/server",
   },
   "include": [
-    "./src/server/"
+    "./src/server"
   ]
 }

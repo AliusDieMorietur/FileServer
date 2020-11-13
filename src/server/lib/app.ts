@@ -16,7 +16,7 @@ export class App {
   };
 
   private startWorker(id: number) {
-    const worker = new Worker('./target/lib/worker.js');
+    const worker = new Worker('./lib/worker.js');
     this.workers[id] = worker;
     worker.on('exit', code => {
       if (code !== 0) this.startWorker(id);
