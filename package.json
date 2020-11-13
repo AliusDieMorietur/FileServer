@@ -5,8 +5,9 @@
   "main": "./server/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && xcopy .\\src\\server\\db .\\target\\db /e /i /c /h /y && xcopy .\\src\\server\\static .\\target\\static /e /i /c /h /y && mkdir .\\target\\storage || true",
-    "run": "node ./target/server.js"
+    "jsx": "npx babel --watch ./src/server/static/jsx_src --out-dir ./src/server/static/js --presets react-latest",
+    "build": "tsc & xcopy .\\src\\server\\db .\\target\\db /e /i /c /h /y & xcopy .\\src\\server\\static .\\target\\static /e /i /c /h /y & mkdir .\\target\\storage & mkdir .\\target\\logs & type nul > .\\target\\logs\\log.txt",
+    "start": "npm run build && node ./target/server.js"
   },
   "repository": {
     "type": "git",
@@ -19,9 +20,14 @@
   },
   "homepage": "https://github.com/AliusDieMorietur/FileServer#readme",
   "devDependencies": {
+    "@types/node": "^14.14.7",
+    "@types/ws": "^7.4.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-latest": "^6.1.0",
     "typescript": "^4.0.5"
   },
   "dependencies": {
-    "@types/node": "^14.14.7"
+    "pg": "^8.5.0",
+    "ws": "^7.4.0"
   }
 }
