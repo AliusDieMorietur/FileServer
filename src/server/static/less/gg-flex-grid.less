@@ -1,0 +1,113 @@
+// out: ../css/gg-flex-grid.css
+
+.flex-grid (@row, @state, @col: 1, @offset: 0) when (@col < (@row + 1)) {
+    .flex-row-@{row} > .flex-col.@{state}-@{col} {
+        width: 100% / @row * @col;
+    }
+    .flex-row-@{row} > .flex-col.offset-@{state}-@{offset} {
+        margin-left: 100% / @row * (@col - 1);
+    }
+    .flex-grid(@row, @state, @col + 1, @offset + 1);
+}
+.visibility(@state) {
+    .visible-inline-@{state} { display: inline-block !important; }
+      .visible-flex-@{state} { display: flex !important; }
+           .visible-@{state} { display: block !important; }
+            .hidden-@{state} { display: none !important; }
+}
+
+[data-content-area="1000px"] .wrapper { max-width: 1000px; }
+[data-content-area="1100px"] .wrapper { max-width: 1100px; }
+[data-content-area="1200px"] .wrapper { max-width: 1200px; }
+[data-content-area="1300px"] .wrapper { max-width: 1300px; }
+[data-content-area="1400px"] .wrapper { max-width: 1400px; }
+[data-content-area="1500px"] .wrapper { max-width: 1500px; }
+
+[data-fix][data-content-area="1000px"] { min-width: 1000px; }
+[data-fix][data-content-area="1100px"] { min-width: 1100px; }
+[data-fix][data-content-area="1200px"] { min-width: 1200px; }
+[data-fix][data-content-area="1300px"] { min-width: 1300px; }
+[data-fix][data-content-area="1400px"] { min-width: 1400px; }
+[data-fix][data-content-area="1500px"] { min-width: 1500px; }
+
+.float-collapse() {
+	&:after {
+		content: "";
+		display: table;
+		clear: both;
+	}
+}
+
+.wrapper {
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+    .float-collapse();
+}
+
+.flex-row-5, .flex-row-12, .flex-row-20, .flex-row-24, .flex-row-60 {
+    margin-left: -15px !important;
+    margin-right: -15px !important;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: calc(100% + 30px);
+    &.no-wrap {
+        flex-wrap: nowrap;
+    }
+    .flex-col {
+        box-sizing: border-box;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+/* Helper classes */
+.float-left  { float: left !important; }
+.float-right { float: right !important; }
+
+@media (min-width: 0px) {
+    .flex-grid(5, xs);
+    .flex-grid(12, xs);
+    .flex-grid(20, xs);
+    .flex-grid(24, xs);
+    .flex-grid(60, xs);
+
+    .visibility(xs);
+}
+@media (min-width: 600px) {
+    .flex-grid(5, sm);
+    .flex-grid(12, sm);
+    .flex-grid(20, sm);
+    .flex-grid(24, sm);
+    .flex-grid(60, sm);
+
+    .visibility(sm);
+}
+@media (min-width: 900px) {
+    .flex-grid(5, md);
+    .flex-grid(12, md);
+    .flex-grid(20, md);
+    .flex-grid(24, md);
+    .flex-grid(60, md);
+
+    .visibility(md);
+}
+@media (min-width: 1200px) {
+    .flex-grid(5, lg);
+    .flex-grid(12, lg);
+    .flex-grid(20, lg);
+    .flex-grid(24, lg);
+    .flex-grid(60, lg);
+
+    .visibility(lg);
+}
+@media (min-width: 1510px) {
+    .flex-grid(5, xlg);
+    .flex-grid(12, xlg);
+    .flex-grid(20, xlg);
+    .flex-grid(24, xlg);
+    .flex-grid(60, xlg);
+
+    .visibility(xlg);
+}
