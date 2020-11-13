@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "jsx": "npx babel --watch ./src/server/static/jsx_src --out-dir ./src/server/static/js --presets react-latest",
-    "build": "tsc && xcopy .\\src\\server\\db .\\target\\db /e /i /c /h /y && xcopy .\\src\\server\\static .\\target\\static /e /i /c /h /y && mkdir .\\target\\storage || true && mkdir .\\target\\logs || true && touch .\\target\\logs\\log.txt",
+    "build": "tsc & xcopy .\\src\\server\\db .\\target\\db /e /i /c /h /y & xcopy .\\src\\server\\static .\\target\\static /e /i /c /h /y & mkdir .\\target\\storage & mkdir .\\target\\logs & type nul > .\\target\\logs\\log.txt",
     "start": "npm run build && node ./target/server.js"
   },
   "repository": {
