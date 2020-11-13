@@ -22,7 +22,7 @@ const MIME_TYPES = {
   svg: 'image/svg+xml',
 };
 
-const STATIC_PATH = process.cwd() + '/target/static/';
+const STATIC_PATH = process.cwd() + '/static/';
 
 const loadFile = async (name: string) => {
   const filePath = path.join(STATIC_PATH, name);

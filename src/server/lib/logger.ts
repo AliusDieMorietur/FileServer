@@ -14,7 +14,7 @@ const COLORS: { [k in LogLevel]: string } = {
 const DATETIME_LENGTH = 19;
 
 class Logger { 
-  private stream = fs.createWriteStream('./target/logs/log.txt', { flags: 'a' })
+  private stream = fs.createWriteStream('./logs/log.txt', { flags: 'a' })
 
   private write(level: LogLevel, ...args: string[]) {
     const s = format('', ...args);
