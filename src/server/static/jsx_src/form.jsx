@@ -12,6 +12,7 @@ class FileForm extends React.Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.upload = this.upload.bind(this);
   }
 
   handleChange(event) {
