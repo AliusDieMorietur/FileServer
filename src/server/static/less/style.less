@@ -1,2 +1,140 @@
 // out: ../css/style.css
 
+@background: #212121;
+@font: #FFFFFF;
+@border: #ADADAD;
+
+html, body {
+  margin: 0px;
+  padding: 0px;
+  background-color: @background;
+}
+
+button, input, textarea {
+  border: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: normal;
+}
+
+a {
+  text-decoration: none;
+};
+
+ul {
+  padding: 0px;
+  li {
+    list-style: none;
+  }
+}
+
+* {
+  outline: none;
+}
+
+
+.form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -150px;
+  margin-left: -250px;
+  width: 500px;
+  height: 300px;
+  font-family: 'Montserrat', sans-serif;
+  color: @font;
+  .tabs {
+    display: flex;
+    justify-content: center;
+    .tab-btn {
+      cursor: pointer;
+      background-color: transparent;
+      color: @border;
+      font-size: 25px;
+      padding: 5px 7.5px;
+      // margin: 0px auto;
+      border-radius: 3px;
+      transition: all 0.2s ease-out;
+      &:first-child {
+        margin-right: 5px;
+      }
+      &:last-child {
+        margin-left: 5px;
+      }
+      &:hover {
+        color: @font;
+      }
+      &.active {
+        color: @background;
+        background-color: @font;
+      }
+    }
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    .form-title {
+      text-align: center;
+      font-size: 20px;
+      margin: 20px 0px 10px 0px;
+    }
+
+    .form-btn {
+      cursor: pointer;
+      background-color: @background;
+      color: @font;
+      font-size: 17px;
+      padding: 5px 7.5px;
+      margin: 10px auto;
+      border: 1px solid @border;
+      border-radius: 3px;
+      transition: all 0.2s ease-out;
+      &:hover {
+        background-color: @font;
+        color: @background;;
+      }
+    }
+    
+    #files {
+      margin: 10px auto;
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+
+    #file-list {
+      margin: 0px auto;
+      li {
+        margin: 10px;
+        text-align: center;
+      }
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      .form-btn {
+        &:first-child {
+          margin-right: 5px;
+        }
+        &:last-child {
+          margin-left: 5px;
+        }
+      }
+    }
+
+    #token {
+      margin: 10px auto;
+      padding: 6px 7.5px;
+      background-color: @background;
+      color: @font;
+      border: 1px solid @border;
+      border-radius: 3px;
+      font-size: 17px;
+    }
+  }
+}

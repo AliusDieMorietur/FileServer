@@ -1,8 +1,5 @@
 'use strict';
 
-const Router = ReactRouterDOM.BrowserRouter;
-const { Link, Route, Switch } = ReactRouterDOM;
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -10,7 +7,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>Hello!</div>
+      <FileForm></FileForm>
     );
   }
 }
