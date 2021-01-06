@@ -33,7 +33,10 @@ class FileForm extends React.Component {
     }).then(
       response => response.json() 
     ).then(
-      success => console.log(success)
+      success => {
+        console.log(success);
+        console.log(1234123412341234);
+      }
     ).catch(
       error => console.log(error) 
     );

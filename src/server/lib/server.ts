@@ -11,11 +11,28 @@ import { logger } from './logger';
 
 const listener = (req: http.IncomingMessage, res) => {
   if (req.url === '/api/upload' && req.method.toLowerCase() === 'post') {
-    const form = formidable({ multiples: true, uploadDir: './storage', keepExtensions: true});
+
+    const token = 'zaplatka';
+    fs.mkdirSync('./storage/' + token);
+
+    const form = new formidable.IncomingForm(); 
+
     form.parse(req, (err, fields, files) => {
+      if (err) throw err;
+      // console.log('fields: ', fields);
+      // console.log('files: ', files);
       res.writeHead(200, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ fields, files }, null, 2));
+      res.end(JSON.stringify({ ok: true, token }, null, 2));
     });
+
+    form.on('fileBegin', (__name, file) => {
+      file.path = './storage/' + token + '/' + file.name;
+    });
+
+    form.on('file', (__name, file) => {
+      console.log('Uploaded ' + file.name);
+    });
+
   } else {  
     const client = new Client({ req, res });
     client.static();
