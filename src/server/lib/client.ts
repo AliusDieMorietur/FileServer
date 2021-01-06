@@ -38,7 +38,6 @@ export class Client {
   private res
   private ip
   private connection
-  private token
 
   constructor({ req, res, connection }: ClientArgs ) {
     this.req = req;

@@ -7,14 +7,13 @@ import { serverConfig } from '../config/server';
 import * as formidable from 'formidable'  ;
 import { Client } from './client';
 import { logger } from './logger';
- 
+import { generateToken } from './auth';
 
-const sessions = [];
 
 const listener = (req: http.IncomingMessage, res) => {
   if (req.url === '/api/upload' && req.method.toLowerCase() === 'post') {
 
-    const token = 'zaplatka';
+    const token = generateToken();
     fs.mkdirSync('./storage/' + token);
 
     const form = new formidable.IncomingForm(); 
@@ -37,8 +36,6 @@ const listener = (req: http.IncomingMessage, res) => {
   } else {  
     const client = new Client({ req, res });
 
-    // TODO call auth to generate new token for client
-
     client.static();
   }
 };
@@ -52,6 +49,7 @@ export class Server {
     const port = ports[threadId - 1];
     this.ws.on('connection', (connection, req) => {
       const client = new Client({ connection, req });
+      
       connection.on('message', (data) => {
         client.message(data);
       })

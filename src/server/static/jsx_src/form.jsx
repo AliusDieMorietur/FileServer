@@ -1,14 +1,14 @@
 
 const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
 const socket = new WebSocket(`${protocol}://${location.host}`);    
-
 class FileForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       files: [],
       tab: 'upload',
-      chosen: ['None']
+      chosen: ['None'],
+      token: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -34,8 +34,9 @@ class FileForm extends React.Component {
       response => response.json() 
     ).then(
       success => {
-        console.log(success);
-        console.log(1234123412341234);
+        if (success.ok) {
+          this.setState({ token: success.token });
+        }
       }
     ).catch(
       error => console.log(error) 
@@ -43,11 +44,19 @@ class FileForm extends React.Component {
   }
 
   render() {
+    function Token(props) {
+      if (props.token !== '') return <h1>Your token: { props.token }</h1>;
+      else return '';
+    }
+    
     function Tab(props) {
       switch(props.tab) {
         case 'upload':
           return  <div className="upload tab">
                       <input id="files" type="file" value={props.value} onChange={props.change} multiple></input>
+                      <Token
+                      token = { props.token }
+                      />
                       <h1 className="form-title">Chosen:</h1>
                       <ul id="file-list">
                         {props.chosen.map(el => <li>{ el }</li>)}
@@ -88,6 +97,7 @@ class FileForm extends React.Component {
           change={this.handleChange}
           chosen={this.state.chosen}
           upload={this.upload}
+          token={ this.state.token }
         />
       </div>
     );

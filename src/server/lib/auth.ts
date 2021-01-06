@@ -38,14 +38,13 @@ const parseCookies = cookie => {
   return values;
 };
 
-// const { db } = application;
-
+// TODO to save addition info about session
 const save = (token, context) => {
   const data = JSON.stringify(context);
   // db.update('Session', { data }, { token });
 };
 
-const restore = async client => {
+const restore = client => {
   // const cachedSession = cache.get(client.req);
   // if (cachedSession) return cachedSession;
   const { cookie } = client.req.headers;
@@ -76,4 +75,5 @@ const remove = (client, token) => {
 
 export const auth = client => {
   client.token = generateToken();
+  
 };

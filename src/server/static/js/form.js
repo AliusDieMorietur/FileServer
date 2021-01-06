@@ -22,7 +22,8 @@ let FileForm = function (_React$Component) {
     _this.state = {
       files: [],
       tab: 'upload',
-      chosen: ['None']
+      chosen: ['None'],
+      token: ''
     };
 
     _this.handleChange = _this.handleChange.bind(_this);
@@ -51,13 +52,29 @@ let FileForm = function (_React$Component) {
         method: 'POST',
         body: data
       }).then(response => response.json()).then(success => {
-        console.log(success);
-        console.log(1234123412341234);
+        if (success.ok) {
+          this.setState({ token: success.token });
+        }
       }).catch(error => console.log(error));
     }
   }, {
     key: 'render',
     value: function render() {
+      function Token(props) {
+        if (props.token !== '') return React.createElement(
+          'h1',
+          {
+            __self: this,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 48
+            }
+          },
+          'Your token: ',
+          props.token
+        );else return '';
+      }
+
       function Tab(props) {
         switch (props.tab) {
           case 'upload':
@@ -66,13 +83,21 @@ let FileForm = function (_React$Component) {
               { className: 'upload tab', __self: this,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 49
+                  lineNumber: 55
                 }
               },
               React.createElement('input', { id: 'files', type: 'file', value: props.value, onChange: props.change, multiple: true, __self: this,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 50
+                  lineNumber: 56
+                }
+              }),
+              React.createElement(Token, {
+                token: props.token,
+                __self: this,
+                __source: {
+                  fileName: _jsxFileName,
+                  lineNumber: 57
                 }
               }),
               React.createElement(
@@ -80,7 +105,7 @@ let FileForm = function (_React$Component) {
                 { className: 'form-title', __self: this,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 51
+                    lineNumber: 60
                   }
                 },
                 'Chosen:'
@@ -90,7 +115,7 @@ let FileForm = function (_React$Component) {
                 { id: 'file-list', __self: this,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 52
+                    lineNumber: 61
                   }
                 },
                 props.chosen.map(el => React.createElement(
@@ -99,7 +124,7 @@ let FileForm = function (_React$Component) {
                     __self: this,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 53
+                      lineNumber: 62
                     }
                   },
                   el
@@ -110,7 +135,7 @@ let FileForm = function (_React$Component) {
                 { className: 'buttons', __self: this,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 55
+                    lineNumber: 64
                   }
                 },
                 React.createElement(
@@ -118,7 +143,7 @@ let FileForm = function (_React$Component) {
                   { className: 'input-btn form-btn', 'for': 'files', __self: this,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 56
+                      lineNumber: 65
                     }
                   },
                   'Choose files'
@@ -128,7 +153,7 @@ let FileForm = function (_React$Component) {
                   { className: 'form-btn', onClick: props.upload, __self: this,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 57
+                      lineNumber: 66
                     }
                   },
                   'Upload'
@@ -142,7 +167,7 @@ let FileForm = function (_React$Component) {
               { className: 'download tab', __self: this,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 62
+                  lineNumber: 71
                 }
               },
               React.createElement(
@@ -150,7 +175,7 @@ let FileForm = function (_React$Component) {
                 { className: 'form-title', __self: this,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 63
+                    lineNumber: 72
                   }
                 },
                 'Enter Token'
@@ -158,7 +183,7 @@ let FileForm = function (_React$Component) {
               React.createElement('input', { id: 'token', type: 'text', __self: this,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 64
+                  lineNumber: 73
                 }
               }),
               React.createElement(
@@ -166,7 +191,7 @@ let FileForm = function (_React$Component) {
                 { className: 'form-btn', __self: this,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 65
+                    lineNumber: 74
                   }
                 },
                 'Download'
@@ -181,7 +206,7 @@ let FileForm = function (_React$Component) {
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 72
+            lineNumber: 81
           }
         },
         React.createElement(
@@ -189,7 +214,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 73
+              lineNumber: 82
             }
           },
           React.createElement(
@@ -199,7 +224,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 74
+                lineNumber: 83
               }
             },
             'Upload'
@@ -211,7 +236,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 79
+                lineNumber: 88
               }
             },
             'Download'
@@ -223,10 +248,11 @@ let FileForm = function (_React$Component) {
           change: this.handleChange,
           chosen: this.state.chosen,
           upload: this.upload,
+          token: this.state.token,
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 85
+            lineNumber: 94
           }
         })
       );
