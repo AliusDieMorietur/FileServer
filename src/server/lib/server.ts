@@ -9,6 +9,8 @@ import { Client } from './client';
 import { logger } from './logger';
  
 
+const sessions = [];
+
 const listener = (req: http.IncomingMessage, res) => {
   if (req.url === '/api/upload' && req.method.toLowerCase() === 'post') {
 
@@ -19,8 +21,7 @@ const listener = (req: http.IncomingMessage, res) => {
 
     form.parse(req, (err, fields, files) => {
       if (err) throw err;
-      // console.log('fields: ', fields);
-      // console.log('files: ', files);
+
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify({ ok: true, token }, null, 2));
     });
@@ -35,6 +36,9 @@ const listener = (req: http.IncomingMessage, res) => {
 
   } else {  
     const client = new Client({ req, res });
+
+    // TODO call auth to generate new token for client
+
     client.static();
   }
 };
@@ -56,6 +60,8 @@ export class Server {
     this.instance.listen(port, () => {
       logger.log(`Listen port ${port}`);
     })
+
+    // TODO read storage to save all available sessions
   }
   
   async close() {
