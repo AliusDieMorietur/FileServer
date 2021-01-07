@@ -8,15 +8,15 @@ import * as formidable from 'formidable'  ;
 import { Client } from './client';
 import { logger } from './logger';
 import { generateToken } from './auth';
+import { readStorage } from "./storage";
 
 
 const listener = (req: http.IncomingMessage, res) => {
   if (req.url === '/api/upload' && req.method.toLowerCase() === 'post') {
-
     const token = generateToken();
     fs.mkdirSync('./storage/' + token);
 
-    const form = new formidable.IncomingForm(); 
+    const form = new formidable.IncomingForm();
 
     form.parse(req, (err, fields, files) => {
       if (err) throw err;
@@ -32,8 +32,9 @@ const listener = (req: http.IncomingMessage, res) => {
     form.on('file', (__name, file) => {
       console.log('Uploaded ' + file.name);
     });
-
-  } else {  
+  } else if (req.url === '/api/download' && req.method.toLowerCase() === 'post') {
+    // const token = req.token;
+  } else {
     const client = new Client({ req, res });
 
     client.static();
@@ -45,11 +46,11 @@ export class Server {
   ws = new ws.Server({ server: this.instance });
 
   constructor() {
-    const { ports } = serverConfig; 
+    const { ports } = serverConfig;
     const port = ports[threadId - 1];
     this.ws.on('connection', (connection, req) => {
       const client = new Client({ connection, req });
-      
+
       connection.on('message', (data) => {
         client.message(data);
       })
@@ -61,7 +62,7 @@ export class Server {
 
     // TODO read storage to save all available sessions
   }
-  
+
   async close() {
     //TODO graceful shutdown
     logger.log('close');

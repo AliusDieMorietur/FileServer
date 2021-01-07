@@ -1,6 +1,6 @@
 
 const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
-const socket = new WebSocket(`${protocol}://${location.host}`);    
+const socket = new WebSocket(`${protocol}://${location.host}`);
 class FileForm extends React.Component {
   constructor(props) {
     super(props);
@@ -31,7 +31,7 @@ class FileForm extends React.Component {
       method: 'POST',
       body: data
     }).then(
-      response => response.json() 
+      response => response.json()
     ).then(
       success => {
         if (success.ok) {
@@ -39,7 +39,29 @@ class FileForm extends React.Component {
         }
       }
     ).catch(
-      error => console.log(error) 
+      error => console.log(error)
+    );
+  }
+
+  download() {
+    const data = new FormData();
+    for (const file of this.state.files) {
+      data.append('files', file, file.name)
+    };
+
+    fetch('/api/download', {
+      method: 'POST',
+      body: data
+    }).then(
+      response => response.json()
+    ).then(
+      success => {
+        if (success.ok) {
+          this.setState({ token: success.token });
+        }
+      }
+    ).catch(
+      error => console.log(error)
     );
   }
 
@@ -76,22 +98,22 @@ class FileForm extends React.Component {
     }
 
     return (
-      <div className="form"> 
+      <div className="form">
         <div className="tabs">
-          <button 
-            className = { "tab-btn " + (this.state.tab === 'upload' ? 'active' : '') } 
+          <button
+            className = { "tab-btn " + (this.state.tab === 'upload' ? 'active' : '') }
             onClick = { () => this.setState({ tab: 'upload' }) }>
             Upload
           </button>
-          <button 
-            className = { "tab-btn " + (this.state.tab === 'download' ? 'active' : '') } 
+          <button
+            className = { "tab-btn " + (this.state.tab === 'download' ? 'active' : '') }
             onClick = { () => this.setState({ tab: 'download' }) }>
             Download
           </button>
         </div>
-        <Tab 
-          tab = { this.state.tab } 
-          value = { this.state.value } 
+        <Tab
+          tab = { this.state.tab }
+          value = { this.state.value }
           change = { this.handleChange }
           chosen = { this.state.chosen }
           upload = { this.upload }
