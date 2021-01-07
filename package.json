@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "jsx": "npx babel --watch ./src/server/static/jsx_src --out-dir ./src/server/static/js --presets react-latest",
-    "build": "tsc & node install.js & npx babel ./src/server/static/jsx_src --out-dir ./src/server/static/js --presets react-latest",
+    "build": "npx babel ./src/server/static/jsx_src --out-dir ./src/server/static/js --presets react-latest & tsc & node install.js",
     "start": "npm run build && cd ./target/server && node ./server.js"
   },
   "repository": {

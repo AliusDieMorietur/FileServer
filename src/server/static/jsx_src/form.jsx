@@ -1,6 +1,3 @@
-
-const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
-const socket = new WebSocket(`${protocol}://${location.host}`);
 class FileForm extends React.Component {
   constructor(props) {
     super(props);
@@ -13,29 +10,27 @@ class FileForm extends React.Component {
       input: '',
     };
 
-    this.handleChange = this.handleChange.bind(this);
+    this.fileUploadChange = this.fileUploadChange.bind(this);
+    this.tokenInputChange = this.tokenInputChange.bind(this);
     this.upload = this.upload.bind(this);
     this.download = this.download.bind(this);
   }
 
-  handleChange(event) {
+  fileUploadChange(event) {
     const chosen = [];
     for (const file of  event.target.files) { chosen.push(file.name); };
     this.setState({ files: event.target.files, chosen });
   }
 
-  inputChange(event) {
-    console.log(event);
-    console.log("3");
-    this.input = event.nativeEvent.data;
-    console.log(this.input);
-    // value={props.input}
+  tokenInputChange(event) {
+    this.setState({ input: event.target.value });
   }
 
   upload() {
     const data = new FormData();
+
     for (const file of this.state.files) {
-      data.append('files', file, file.name)
+      data.append('files', file, file.name);
     };
 
     fetch('/api/upload', {
@@ -45,7 +40,7 @@ class FileForm extends React.Component {
       response => response.json()
     ).then(
       success => {
-            console.log(success);
+        console.log(success);
         if (success.ok) {
           this.setState({ token: success.token });
         }
@@ -56,13 +51,16 @@ class FileForm extends React.Component {
   }
 
   download() {
-    console.log(1);
+    console.log(this.state.input);
     fetch('/api/download', {
       method: 'POST',
       body: this.state.input
     })
     .then(
       response => {
+        console.log('response: ', response);
+        // this.setState({ dataList: response });
+        
         // response.blob().then(blob => {
         //   const newBlob = new Blob([blob]);
   
@@ -108,7 +106,7 @@ class FileForm extends React.Component {
         case 'download':
           return  <div className="download tab">
                     <h1 className="form-title">Enter Token</h1>
-                    <input id="token" type="text" onChange = {props.inputChange}/>
+                    <input id="token" type="text" value = { props.input } onChange = {props.tokenInputChange}/>
                     <h1 className="form-title">Available:</h1>
                       <ul id="file-list">
                         { props.dataList.map(el => <li>{ el }</li>) }
@@ -136,12 +134,12 @@ class FileForm extends React.Component {
         <Tab
           tab = { this.state.tab }
           value = { this.state.value }
-          change = { this.handleChange }
+          change = { this.fileUploadChange }
           chosen = { this.state.chosen }
           upload = { this.upload }
           download = { this.download }
           input = { this.state.input }
-          inputChange = { this.inputChange }
+          tokenInputChange = { this.tokenInputChange }
           token = { this.state.token }
           dataList = { this.state.dataList }
         />

@@ -64,11 +64,10 @@ export class Client {
 
   async message(data) {
     try {
-      fs.writeFile("123", Buffer.from(data).toString(), (err) => {
-        if (err) throw err;
-        console.log('The file has been saved!');
-      });
-      //TODO parse data correctly
+        console.log(data);
+        fs.writeFile('abbb', data, (err) => {
+          if (err) throw err;
+        });
     } catch (error) {
       console.error(error);
     }

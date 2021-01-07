@@ -1,47 +1,17 @@
 import * as ws from 'ws';
 import * as http from 'http';
-import * as fs from 'fs';
-import * as path from 'path'
 import { threadId } from 'worker_threads';
 import { serverConfig } from '../config/server';
-import * as formidable from 'formidable'  ;
 import { Client } from './client';
 import { logger } from './logger';
-import { generateToken } from './auth';
-import { readStorage, listStorage } from "./storage";
-
+import * as api from './api'
 
 const listener = (req: http.IncomingMessage, res) => {
-  if (req.url === '/api/upload' && req.method.toLowerCase() === 'post') {
-    const token = generateToken();
-    fs.mkdirSync('./storage/' + token);
-
-    const form = new formidable.IncomingForm();
-
-    form.parse(req, (err, fields, files) => {
-      if (err) throw err;
-
-      res.writeHead(200, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ ok: true, token }, null, 2));
-    });
-
-    form.on('fileBegin', (__name, file) => {
-      file.path = './storage/' + token + '/' + file.name;
-    });
-
-    form.on('file', (__name, file) => {
-      console.log('Uploaded ' + file.name);
-    });
-  } else if (req.url === '/api/download' && req.method.toLowerCase() === 'post') {
-    // const token = req.token;
-    req.on('data', data => {
-      // readStorage(data.toString()).then( data => res.end(fs.readFileSync(data)));
-      // res.end(listStorage(data.toString()));
-      res.end("2");
-    });
+  const [domen, command] = req.url.substring(1).split('/');
+  if (domen === 'api') {
+    api[command](req, res);
   } else {
     const client = new Client({ req, res });
-
     client.static();
   }
 };
