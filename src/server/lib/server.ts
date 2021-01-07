@@ -8,7 +8,7 @@ import * as formidable from 'formidable'  ;
 import { Client } from './client';
 import { logger } from './logger';
 import { generateToken } from './auth';
-import { readStorage } from "./storage";
+import { readStorage, listStorage } from "./storage";
 
 
 const listener = (req: http.IncomingMessage, res) => {
@@ -34,6 +34,11 @@ const listener = (req: http.IncomingMessage, res) => {
     });
   } else if (req.url === '/api/download' && req.method.toLowerCase() === 'post') {
     // const token = req.token;
+    req.on('data', data => {
+      // readStorage(data.toString()).then( data => res.end(fs.readFileSync(data)));
+      // res.end(listStorage(data.toString()));
+      res.end("2");
+    });
   } else {
     const client = new Client({ req, res });
 

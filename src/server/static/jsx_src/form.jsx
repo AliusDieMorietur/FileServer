@@ -9,16 +9,27 @@ class FileForm extends React.Component {
       tab: 'upload',
       chosen: ['None'],
       token: '',
+      dataList: [],
+      input: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.upload = this.upload.bind(this);
+    this.download = this.download.bind(this);
   }
 
   handleChange(event) {
     const chosen = [];
     for (const file of  event.target.files) { chosen.push(file.name); };
     this.setState({ files: event.target.files, chosen });
+  }
+
+  inputChange(event) {
+    console.log(event);
+    console.log("3");
+    this.input = event.nativeEvent.data;
+    console.log(this.input);
+    // value={props.input}
   }
 
   upload() {
@@ -34,6 +45,7 @@ class FileForm extends React.Component {
       response => response.json()
     ).then(
       success => {
+            console.log(success);
         if (success.ok) {
           this.setState({ token: success.token });
         }
@@ -44,21 +56,27 @@ class FileForm extends React.Component {
   }
 
   download() {
-    const data = new FormData();
-    for (const file of this.state.files) {
-      data.append('files', file, file.name)
-    };
-
+    console.log(1);
     fetch('/api/download', {
       method: 'POST',
-      body: data
-    }).then(
-      response => response.json()
-    ).then(
-      success => {
-        if (success.ok) {
-          this.setState({ token: success.token });
-        }
+      body: this.state.input
+    })
+    .then(
+      response => {
+        // response.blob().then(blob => {
+        //   const newBlob = new Blob([blob]);
+  
+        //   const blobUrl = window.URL.createObjectURL(newBlob);
+  
+        //   const link = document.createElement('a');
+        //   link.href = blobUrl;
+        //   link.setAttribute('download', `1.txt`);
+        //   document.body.appendChild(link);
+        //   link.click();
+        //   link.parentNode.removeChild(link);
+  
+        //   window.URL.revokeObjectURL(blob);
+        // }); 
       }
     ).catch(
       error => console.log(error)
@@ -90,8 +108,12 @@ class FileForm extends React.Component {
         case 'download':
           return  <div className="download tab">
                     <h1 className="form-title">Enter Token</h1>
-                    <input id="token" type="text"/>
-                    <button className="form-btn">Download</button>
+                    <input id="token" type="text" onChange = {props.inputChange}/>
+                    <h1 className="form-title">Available:</h1>
+                      <ul id="file-list">
+                        { props.dataList.map(el => <li>{ el }</li>) }
+                      </ul>
+                    <button className="form-btn" onClick = { props.download }>Download</button>
                   </div>
           break;
       }
@@ -117,7 +139,11 @@ class FileForm extends React.Component {
           change = { this.handleChange }
           chosen = { this.state.chosen }
           upload = { this.upload }
+          download = { this.download }
+          input = { this.state.input }
+          inputChange = { this.inputChange }
           token = { this.state.token }
+          dataList = { this.state.dataList }
         />
       </div>
     );
