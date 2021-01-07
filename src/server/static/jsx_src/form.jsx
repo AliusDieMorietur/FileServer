@@ -45,25 +45,23 @@ class FileForm extends React.Component {
 
   render() {
     function Token(props) {
-      if (props.token !== '') return <h1>Your token: { props.token }</h1>;
+      if (props.token !== '') return <h1 className="form-title">Your token: { props.token }</h1>;
       else return '';
     }
-    
+
     function Tab(props) {
       switch(props.tab) {
         case 'upload':
           return  <div className="upload tab">
-                      <input id="files" type="file" value={props.value} onChange={props.change} multiple></input>
-                      <Token
-                      token = { props.token }
-                      />
+                      <input id="files" type="file" value = { props.value } onChange = { props.change } multiple></input>
+                      <Token token = { props.token } />
                       <h1 className="form-title">Chosen:</h1>
                       <ul id="file-list">
-                        {props.chosen.map(el => <li>{ el }</li>)}
+                        { props.chosen.map(el => <li>{ el }</li>) }
                       </ul>
                       <div className="buttons">
                         <label className="input-btn form-btn" for="files">Choose files</label>
-                        <button className="form-btn" onClick={props.upload}>Upload</button>
+                        <button className="form-btn" onClick = { props.upload }>Upload</button>
                       </div>
                   </div>
           break;
@@ -81,23 +79,23 @@ class FileForm extends React.Component {
       <div className="form"> 
         <div className="tabs">
           <button 
-            className={"tab-btn " + (this.state.tab === 'upload' ? 'active' : '')} 
-            onClick={() => this.setState({ tab: 'upload' })}>
+            className = { "tab-btn " + (this.state.tab === 'upload' ? 'active' : '') } 
+            onClick = { () => this.setState({ tab: 'upload' }) }>
             Upload
           </button>
           <button 
-            className={"tab-btn " + (this.state.tab === 'download' ? 'active' : '')} 
-            onClick={() => this.setState({ tab: 'download' })}>
+            className = { "tab-btn " + (this.state.tab === 'download' ? 'active' : '') } 
+            onClick = { () => this.setState({ tab: 'download' }) }>
             Download
           </button>
         </div>
         <Tab 
-          tab={this.state.tab} 
-          value={this.state.value} 
-          change={this.handleChange}
-          chosen={this.state.chosen}
-          upload={this.upload}
-          token={ this.state.token }
+          tab = { this.state.tab } 
+          value = { this.state.value } 
+          change = { this.handleChange }
+          chosen = { this.state.chosen }
+          upload = { this.upload }
+          token = { this.state.token }
         />
       </div>
     );

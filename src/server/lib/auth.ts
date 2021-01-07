@@ -1,18 +1,12 @@
 import * as crypto from 'crypto';
 
 const BYTE  = 256;
-const TOKEN = 'token';
 const TOKEN_LENGTH = 32;
 const ALPHA_UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const ALPHA_LOWER = 'abcdefghijklmnopqrstuvwxyz';
 const ALPHA = ALPHA_UPPER + ALPHA_LOWER;
 const DIGIT = '0123456789';
 const ALPHA_DIGIT = ALPHA + DIGIT;
-const EPOCH = 'Thu, 01 Jan 1970 00:00:00 GMT';
-const FUTURE = 'Fri, 01 Jan 2100 00:00:00 GMT';
-const LOCATION = 'Path=/; Domain';
-const COOKIE_DELETE = `${TOKEN}=deleted; Expires=${EPOCH}; ${LOCATION}=`;
-const COOKIE_HOST = `Expires=${FUTURE}; ${LOCATION}`;
 
 export const generateToken = () => {
   const base = ALPHA_DIGIT.length;
@@ -75,5 +69,4 @@ const remove = (client, token) => {
 
 export const auth = client => {
   client.token = generateToken();
-  
 };
