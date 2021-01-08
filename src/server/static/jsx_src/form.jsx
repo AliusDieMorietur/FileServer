@@ -1,3 +1,40 @@
+function Tab(props) {
+  let token = props.token !== '' ? <h1 className="form-title">Your token: { props.token }</h1> : '';
+
+  let uploadTab = <div className="upload tab">
+                    <input id="files" type="file" value = { props.value } onChange = { props.change } multiple></input>
+                    { token }
+                    <h1 className="form-title">Chosen:</h1>
+                    <ul id="file-list">
+                      { props.chosen.map(el => <li>{ el }</li>) }
+                    </ul>
+                    <div className="buttons">
+                      <label className="input-btn form-btn" for="files">Choose files</label>
+                      <button className="form-btn" onClick = { props.upload }>Upload</button>
+                    </div>
+                  </div>;
+
+  let downloadTab = <div className="download tab">
+                      <h1 className="form-title">Enter Token</h1>
+                      <input id="token" type="text" value = { props.input } onChange = {props.tokenInputChange}/>
+                      <h1 className="form-title">Available:</h1>
+                        <ul id="file-list">
+                          { props.dataList.map(el => <li>{ el }</li>) }
+                        </ul>
+                      <button className="form-btn" onClick = { props.download }>Download</button>
+                    </div>;
+
+  switch(props.tab) {
+    case 'upload':
+      return uploadTab;
+      break;
+    case 'download':
+      return downloadTab;
+      break;
+  }
+}
+
+
 class FileForm extends React.Component {
   constructor(props) {
     super(props);
@@ -82,41 +119,7 @@ class FileForm extends React.Component {
   }
 
   render() {
-    function Token(props) {
-      if (props.token !== '') return <h1 className="form-title">Your token: { props.token }</h1>;
-      else return '';
-    }
-
-    function Tab(props) {
-      switch(props.tab) {
-        case 'upload':
-          return  <div className="upload tab">
-                      <input id="files" type="file" value = { props.value } onChange = { props.change } multiple></input>
-                      <Token token = { props.token } />
-                      <h1 className="form-title">Chosen:</h1>
-                      <ul id="file-list">
-                        { props.chosen.map(el => <li>{ el }</li>) }
-                      </ul>
-                      <div className="buttons">
-                        <label className="input-btn form-btn" for="files">Choose files</label>
-                        <button className="form-btn" onClick = { props.upload }>Upload</button>
-                      </div>
-                  </div>
-          break;
-        case 'download':
-          return  <div className="download tab">
-                    <h1 className="form-title">Enter Token</h1>
-                    <input id="token" type="text" value = { props.input } onChange = {props.tokenInputChange}/>
-                    <h1 className="form-title">Available:</h1>
-                      <ul id="file-list">
-                        { props.dataList.map(el => <li>{ el }</li>) }
-                      </ul>
-                    <button className="form-btn" onClick = { props.download }>Download</button>
-                  </div>
-          break;
-      }
-    }
-
+    
     return (
       <div className="form">
         <div className="tabs">
