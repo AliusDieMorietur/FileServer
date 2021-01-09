@@ -1,6 +1,6 @@
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _jsxFileName = 'src\\server\\static\\jsx_src\\form.jsx';
+var _jsxFileName = 'src/server/static/jsx_src/form.jsx';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -139,16 +139,25 @@ function Tab(props) {
           lineNumber: 21
         }
       },
-      props.dataList.map(el => React.createElement(
+      props.fileList.map(el => React.createElement(
         'li',
         {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 22
+            lineNumber: 23
           }
         },
-        el
+        React.createElement(
+          'button',
+          { classname: 'form-btn', onClick: props.fileSelect, __self: this,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 24
+            }
+          },
+          el
+        )
       ))
     ),
     React.createElement(
@@ -156,7 +165,7 @@ function Tab(props) {
       { className: 'form-btn', onClick: props.download, __self: this,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 24
+          lineNumber: 30
         }
       },
       'Download'
@@ -186,12 +195,14 @@ let FileForm = function (_React$Component) {
       tab: 'upload',
       chosen: ['None'],
       token: '',
+      fileSelected: '',
       dataList: [],
       input: ''
     };
 
     _this.fileUploadChange = _this.fileUploadChange.bind(_this);
     _this.tokenInputChange = _this.tokenInputChange.bind(_this);
+    _this.fileSelect = _this.fileSelect.bind(_this);
     _this.upload = _this.upload.bind(_this);
     _this.download = _this.download.bind(_this);
     return _this;
@@ -209,7 +220,14 @@ let FileForm = function (_React$Component) {
   }, {
     key: 'tokenInputChange',
     value: function tokenInputChange(event) {
-      this.setState({ input: event.target.value });
+      this.setState({ input: event.target.value, fileSelected: '' });
+    }
+  }, {
+    key: 'fileSelect',
+    value: function fileSelect(event) {
+      console.log("click!");
+      console.log(event);
+      this.setState({ fileSelected: event.target.innerText });
     }
   }, {
     key: 'upload',
@@ -236,37 +254,41 @@ let FileForm = function (_React$Component) {
       console.log(this.state.input);
       fetch('/api/download', {
         method: 'POST',
-        body: this.state.input
+        body: JSON.stringify([this.state.input, this.state.fileSelected])
       }).then(response => {
         console.log('response: ', response);
-        // this.setState({ dataList: response });
+        if (this.state.fileSelected == '') {
+          response.json().then(data => {
+            console.log('response json: ', data);
+            this.setState({ dataList: data });
+          });
+        } else {
+          response.blob().then(blob => {
+            const newBlob = new Blob([blob]);
 
-        // response.blob().then(blob => {
-        //   const newBlob = new Blob([blob]);
+            const blobUrl = window.URL.createObjectURL(newBlob);
 
-        //   const blobUrl = window.URL.createObjectURL(newBlob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.setAttribute('download', this.state.fileSelected);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
 
-        //   const link = document.createElement('a');
-        //   link.href = blobUrl;
-        //   link.setAttribute('download', `1.txt`);
-        //   document.body.appendChild(link);
-        //   link.click();
-        //   link.parentNode.removeChild(link);
-
-        //   window.URL.revokeObjectURL(blob);
-        // }); 
+            window.URL.revokeObjectURL(blob);
+          });
+        }
       }).catch(error => console.log(error));
     }
   }, {
     key: 'render',
     value: function render() {
-
       return React.createElement(
         'div',
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 124
+            lineNumber: 142
           }
         },
         React.createElement(
@@ -274,7 +296,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 125
+              lineNumber: 143
             }
           },
           React.createElement(
@@ -284,7 +306,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 126
+                lineNumber: 144
               }
             },
             'Upload'
@@ -296,7 +318,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 131
+                lineNumber: 149
               }
             },
             'Download'
@@ -311,12 +333,13 @@ let FileForm = function (_React$Component) {
           download: this.download,
           input: this.state.input,
           tokenInputChange: this.tokenInputChange,
+          fileSelect: this.fileSelect,
           token: this.state.token,
-          dataList: this.state.dataList,
+          fileList: this.state.dataList,
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 137
+            lineNumber: 155
           }
         })
       );

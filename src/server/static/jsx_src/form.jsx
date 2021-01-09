@@ -19,7 +19,13 @@ function Tab(props) {
                       <input id="token" type="text" value = { props.input } onChange = {props.tokenInputChange}/>
                       <h1 className="form-title">Available:</h1>
                         <ul id="file-list">
-                          { props.dataList.map(el => <li>{ el }</li>) }
+                          { props.fileList.map(el =>
+                            <li>
+                              <button classname="form-btn" onClick={props.fileSelect}>
+                                { el }
+                              </button>
+                            </li>
+                          ) }
                         </ul>
                       <button className="form-btn" onClick = { props.download }>Download</button>
                     </div>;
@@ -43,12 +49,14 @@ class FileForm extends React.Component {
       tab: 'upload',
       chosen: ['None'],
       token: '',
+      fileSelected: '',
       dataList: [],
       input: '',
     };
 
     this.fileUploadChange = this.fileUploadChange.bind(this);
     this.tokenInputChange = this.tokenInputChange.bind(this);
+    this.fileSelect = this.fileSelect.bind(this);
     this.upload = this.upload.bind(this);
     this.download = this.download.bind(this);
   }
@@ -60,7 +68,13 @@ class FileForm extends React.Component {
   }
 
   tokenInputChange(event) {
-    this.setState({ input: event.target.value });
+    this.setState({ input: event.target.value, fileSelected: '' });
+  }
+
+  fileSelect(event) {
+    console.log("click!");
+    console.log(event);
+    this.setState({ fileSelected: event.target.innerText });
   }
 
   upload() {
@@ -91,27 +105,32 @@ class FileForm extends React.Component {
     console.log(this.state.input);
     fetch('/api/download', {
       method: 'POST',
-      body: this.state.input
+      body: JSON.stringify([this.state.input, this.state.fileSelected])
     })
     .then(
       response => {
         console.log('response: ', response);
-        // this.setState({ dataList: response });
-        
-        // response.blob().then(blob => {
-        //   const newBlob = new Blob([blob]);
-  
-        //   const blobUrl = window.URL.createObjectURL(newBlob);
-  
-        //   const link = document.createElement('a');
-        //   link.href = blobUrl;
-        //   link.setAttribute('download', `1.txt`);
-        //   document.body.appendChild(link);
-        //   link.click();
-        //   link.parentNode.removeChild(link);
-  
-        //   window.URL.revokeObjectURL(blob);
-        // }); 
+        if (this.state.fileSelected == '') {
+          response.json().then(data => {
+            console.log('response json: ', data);
+            this.setState({ dataList: data });
+          });
+        } else {
+          response.blob().then(blob => {
+            const newBlob = new Blob([blob]);
+
+            const blobUrl = window.URL.createObjectURL(newBlob);
+
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.setAttribute('download', this.state.fileSelected);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+
+            window.URL.revokeObjectURL(blob);
+          });
+        }
       }
     ).catch(
       error => console.log(error)
@@ -119,7 +138,6 @@ class FileForm extends React.Component {
   }
 
   render() {
-    
     return (
       <div className="form">
         <div className="tabs">
@@ -143,8 +161,9 @@ class FileForm extends React.Component {
           download = { this.download }
           input = { this.state.input }
           tokenInputChange = { this.tokenInputChange }
+          fileSelect = { this.fileSelect }
           token = { this.state.token }
-          dataList = { this.state.dataList }
+          fileList = { this.state.dataList }
         />
       </div>
     );
