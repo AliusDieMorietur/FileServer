@@ -26,7 +26,6 @@ export class Server {
     const port = ports[threadId - 1];
     this.ws.on('connection', (connection, req) => {
       const client = new Client({ connection, req });
-
       connection.on('message', (data) => {
         client.message(data);
       })

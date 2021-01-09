@@ -40,6 +40,14 @@ function Tab(props) {
   }
 }
 
+const stringToArrayBuffer = s => {
+  const buf = new ArrayBuffer(s.length); 
+  let bufView = new Uint8Array(buf);
+  for (let i = 0, strLen = s.length; i < strLen; i++) {
+    bufView[i] = s.charCodeAt(i);
+  }
+  return buf;
+};
 
 class FileForm extends React.Component {
   constructor(props) {
@@ -82,25 +90,60 @@ class FileForm extends React.Component {
   upload() {
     const data = new FormData();
 
-    for (const file of this.state.files) {
-      data.append('files', file, file.name);
-    };
+    const socket = new WebSocket('ws://' + location.host);
+    socket.addEventListener('open', () => {
 
-    fetch('/api/upload', {
-      method: 'POST',
-      body: data
-    }).then(
-      response => response.json()
-    ).then(
-      success => {
-        console.log(success);
-        if (success.ok) {
-          this.setState({ token: success.token });
-        }
-      }
-    ).catch(
-      error => console.log(error)
-    );
+      for (const file of this.state.files) {
+        const reader = new FileReader();
+
+        reader.onload = event => {
+          console.log(1, event.target.result);
+          const fileBuffer = event.target.result;
+          const fileBufferView = new Uint8Array(fileBuffer);
+          const { name } = file;
+          const nameBuffer = stringToArrayBuffer(name + '\0');
+          const nameBufferView = new Uint8Array(nameBuffer);
+          const newBufferLen = fileBuffer.byteLength + nameBuffer.byteLength;
+          let newBuffer = new ArrayBuffer(newBufferLen);
+          let newBufferView = new Uint8Array(newBuffer);
+
+          for (let i = 0; i < nameBuffer.byteLength; i++) {
+            newBufferView[i] =  nameBufferView[i];
+          }
+
+
+          
+          for (let i = nameBuffer.byteLength; i < newBufferLen; i++) {
+            newBufferView[i] = fileBufferView[i - nameBuffer.byteLength];
+          }
+
+          console.log(2, newBuffer);
+
+          socket.send(newBuffer);
+        };
+
+        reader.readAsArrayBuffer(file);
+        // console.log(file);
+        // data.append('files', file, file.name);
+      };
+    });
+
+
+    // fetch('/api/upload', {
+    //   method: 'POST',
+    //   body: data
+    // }).then(
+    //   response => response.json()
+    // ).then(
+    //   success => {
+    //     console.log(success);
+    //     if (success.ok) {
+    //       this.setState({ token: success.token });
+    //     }
+    //   }
+    // ).catch(
+    //   error => console.log(error)
+    // );
   }
 
   download() {

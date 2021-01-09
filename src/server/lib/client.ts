@@ -33,6 +33,10 @@ const loadFile = async (name: string) => {
   }
 };
 
+const arrayBufferToString = buffer => {
+  return String.fromCharCode.apply(null, new Uint8Array(buffer));
+}
+
 export class Client {
   private req
   private res
@@ -64,10 +68,31 @@ export class Client {
 
   async message(data) {
     try {
-        console.log(data);
-        fs.writeFile('abbb', data, (err) => {
-          if (err) throw err;
-        });
+      console.log(data);
+      const bufferView = new Uint8Array(data);
+      let nameBufferLen = 0;
+      let name = '';
+
+      for (let i = 0; i < bufferView.byteLength; i++) {
+        if (bufferView[i] === 0) break;
+        nameBufferLen++;
+        name += String.fromCharCode(bufferView[i]);
+      }
+
+      const dataBuffer = new Uint8Array(bufferView.byteLength - nameBufferLen - 1);
+
+      for (let i = nameBufferLen + 1; i < bufferView.byteLength; i++) {
+        dataBuffer[i - nameBufferLen - 1] = bufferView[i];
+      }
+
+      console.log(name);
+      console.log(arrayBufferToString(dataBuffer));
+
+      fs.writeFile('./storage/' + name, dataBuffer, (err) => {
+        if (err) throw err;
+        console.log('ok');
+      });
+
     } catch (error) {
       console.error(error);
     }

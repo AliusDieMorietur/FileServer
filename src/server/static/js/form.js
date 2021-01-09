@@ -1,6 +1,6 @@
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _jsxFileName = 'src/server/static/jsx_src/form.jsx';
+var _jsxFileName = 'src\\server\\static\\jsx_src\\form.jsx';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -188,6 +188,15 @@ function Tab(props) {
   }
 }
 
+const stringToArrayBuffer = s => {
+  const buf = new ArrayBuffer(s.length);
+  let bufView = new Uint8Array(buf);
+  for (let i = 0, strLen = s.length; i < strLen; i++) {
+    bufView[i] = s.charCodeAt(i);
+  }
+  return buf;
+};
+
 let FileForm = function (_React$Component) {
   _inherits(FileForm, _React$Component);
 
@@ -242,19 +251,56 @@ let FileForm = function (_React$Component) {
     value: function upload() {
       const data = new FormData();
 
-      for (const file of this.state.files) {
-        data.append('files', file, file.name);
-      };
+      const socket = new WebSocket('ws://' + location.host);
+      socket.addEventListener('open', () => {
+        for (const file of this.state.files) {
+          const reader = new FileReader();
 
-      fetch('/api/upload', {
-        method: 'POST',
-        body: data
-      }).then(response => response.json()).then(success => {
-        console.log(success);
-        if (success.ok) {
-          this.setState({ token: success.token });
-        }
-      }).catch(error => console.log(error));
+          reader.onload = event => {
+            console.log(1, event.target.result);
+            const fileBuffer = event.target.result;
+            const fileBufferView = new Uint8Array(fileBuffer);
+            const { name } = file;
+            const nameBuffer = stringToArrayBuffer(name + '\0');
+            const nameBufferView = new Uint8Array(nameBuffer);
+            const newBufferLen = fileBuffer.byteLength + nameBuffer.byteLength;
+            let newBuffer = new ArrayBuffer(newBufferLen);
+            let newBufferView = new Uint8Array(newBuffer);
+
+            for (let i = 0; i < nameBuffer.byteLength; i++) {
+              newBufferView[i] = nameBufferView[i];
+            }
+
+            for (let i = nameBuffer.byteLength; i < newBufferLen; i++) {
+              newBufferView[i] = fileBufferView[i - nameBuffer.byteLength];
+            }
+
+            console.log(2, newBuffer);
+
+            socket.send(newBuffer);
+          };
+
+          reader.readAsArrayBuffer(file);
+          // console.log(file);
+          // data.append('files', file, file.name);
+        };
+      });
+
+      // fetch('/api/upload', {
+      //   method: 'POST',
+      //   body: data
+      // }).then(
+      //   response => response.json()
+      // ).then(
+      //   success => {
+      //     console.log(success);
+      //     if (success.ok) {
+      //       this.setState({ token: success.token });
+      //     }
+      //   }
+      // ).catch(
+      //   error => console.log(error)
+      // );
     }
   }, {
     key: 'download',
@@ -305,7 +351,7 @@ let FileForm = function (_React$Component) {
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 156
+            lineNumber: 198
           }
         },
         React.createElement(
@@ -313,7 +359,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 157
+              lineNumber: 199
             }
           },
           React.createElement(
@@ -323,7 +369,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 158
+                lineNumber: 200
               }
             },
             'Upload'
@@ -335,7 +381,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 163
+                lineNumber: 205
               }
             },
             'Download'
@@ -356,7 +402,7 @@ let FileForm = function (_React$Component) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 169
+            lineNumber: 211
           }
         })
       );
