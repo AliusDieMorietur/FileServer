@@ -19,13 +19,13 @@ function Tab(props) {
                       <input id="token" type="text" value = { props.input } onChange = {props.tokenInputChange}/>
                       <h1 className="form-title">Available:</h1>
                         <ul id="file-list">
-                          { props.fileList.map(el =>
-                            <li>
-                              <button classname="form-btn" onClick={props.fileSelect}>
-                                { el }
-                              </button>
+                          {props.fileList.map(el => <li>
+                            {/* <input type="checkbox" checked={x} onChange={soldCheckbox} /> */}
+
+                              <input type="checkbox" id={el} name={el} onChange = { props.fileSelect }/>
+                              <label for={el}>{el}</label>
                             </li>
-                          ) }
+                          )}
                         </ul>
                       <button className="form-btn" onClick = { props.download }>Download</button>
                     </div>;
@@ -49,7 +49,7 @@ class FileForm extends React.Component {
       tab: 'upload',
       chosen: ['None'],
       token: '',
-      fileSelected: '',
+      filesSelected: [],
       dataList: [],
       input: '',
     };
@@ -68,13 +68,15 @@ class FileForm extends React.Component {
   }
 
   tokenInputChange(event) {
-    this.setState({ input: event.target.value, fileSelected: '' });
+    this.setState({ input: event.target.value, fileSelected: [] });
   }
 
   fileSelect(event) {
-    console.log("click!");
-    console.log(event);
-    this.setState({ fileSelected: event.target.innerText });
+    if (event.target.checked) {
+      this.state.filesSelected.push(event.target.id);
+    } else {
+      this.state.filesSelected.splice(this.state.filesSelected.indexOf(event.target.id), 1);
+    }
   }
 
   upload() {
@@ -102,39 +104,51 @@ class FileForm extends React.Component {
   }
 
   download() {
-    console.log(this.state.input);
-    fetch('/api/download', {
-      method: 'POST',
-      body: JSON.stringify([this.state.input, this.state.fileSelected])
-    })
-    .then(
-      response => {
-        console.log('response: ', response);
-        if (this.state.fileSelected == '') {
+    if (this.state.filesSelected.length === 0) {
+      fetch('/api/download', {
+        method: 'POST',
+        body: JSON.stringify([this.state.input, ''])
+      })
+      .then(
+        response => {
+          console.log('response: ', response);
           response.json().then(data => {
             console.log('response json: ', data);
             this.setState({ dataList: data });
           });
-        } else {
+        }
+      ).catch(
+        error => console.log(error)
+      );
+    } else {
+      for (const file of this.state.filesSelected) {
+        fetch('/api/download', {
+          method: 'POST',
+          body: JSON.stringify([this.state.input, file])
+        })
+        .then(response => {
+          console.log('response: ', response);
+
           response.blob().then(blob => {
             const newBlob = new Blob([blob]);
 
             const blobUrl = window.URL.createObjectURL(newBlob);
 
+            //probably possible to refactor that shit into proper links
             const link = document.createElement('a');
             link.href = blobUrl;
-            link.setAttribute('download', this.state.fileSelected);
+            link.setAttribute('download', file);
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
 
             window.URL.revokeObjectURL(blob);
           });
-        }
+        }).catch(
+          error => console.log(error)
+        );
       }
-    ).catch(
-      error => console.log(error)
-    );
+    }
   }
 
   render() {

@@ -145,15 +145,21 @@ function Tab(props) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 23
+            lineNumber: 22
           }
         },
+        React.createElement('input', { type: 'checkbox', id: el, name: el, onChange: props.fileSelect, __self: this,
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 25
+          }
+        }),
         React.createElement(
-          'button',
-          { classname: 'form-btn', onClick: props.fileSelect, __self: this,
+          'label',
+          { 'for': el, __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 24
+              lineNumber: 26
             }
           },
           el
@@ -195,7 +201,7 @@ let FileForm = function (_React$Component) {
       tab: 'upload',
       chosen: ['None'],
       token: '',
-      fileSelected: '',
+      filesSelected: [],
       dataList: [],
       input: ''
     };
@@ -220,14 +226,16 @@ let FileForm = function (_React$Component) {
   }, {
     key: 'tokenInputChange',
     value: function tokenInputChange(event) {
-      this.setState({ input: event.target.value, fileSelected: '' });
+      this.setState({ input: event.target.value, fileSelected: [] });
     }
   }, {
     key: 'fileSelect',
     value: function fileSelect(event) {
-      console.log("click!");
-      console.log(event);
-      this.setState({ fileSelected: event.target.innerText });
+      if (event.target.checked) {
+        this.state.filesSelected.push(event.target.id);
+      } else {
+        this.state.filesSelected.splice(this.state.filesSelected.indexOf(event.target.id), 1);
+      }
     }
   }, {
     key: 'upload',
@@ -251,34 +259,43 @@ let FileForm = function (_React$Component) {
   }, {
     key: 'download',
     value: function download() {
-      console.log(this.state.input);
-      fetch('/api/download', {
-        method: 'POST',
-        body: JSON.stringify([this.state.input, this.state.fileSelected])
-      }).then(response => {
-        console.log('response: ', response);
-        if (this.state.fileSelected == '') {
+      if (this.state.filesSelected.length === 0) {
+        fetch('/api/download', {
+          method: 'POST',
+          body: JSON.stringify([this.state.input, ''])
+        }).then(response => {
+          console.log('response: ', response);
           response.json().then(data => {
             console.log('response json: ', data);
             this.setState({ dataList: data });
           });
-        } else {
-          response.blob().then(blob => {
-            const newBlob = new Blob([blob]);
+        }).catch(error => console.log(error));
+      } else {
+        for (const file of this.state.filesSelected) {
+          fetch('/api/download', {
+            method: 'POST',
+            body: JSON.stringify([this.state.input, file])
+          }).then(response => {
+            console.log('response: ', response);
 
-            const blobUrl = window.URL.createObjectURL(newBlob);
+            response.blob().then(blob => {
+              const newBlob = new Blob([blob]);
 
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.setAttribute('download', this.state.fileSelected);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
+              const blobUrl = window.URL.createObjectURL(newBlob);
 
-            window.URL.revokeObjectURL(blob);
-          });
+              //probably possible to refactor that shit into proper links
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.setAttribute('download', file);
+              document.body.appendChild(link);
+              link.click();
+              link.parentNode.removeChild(link);
+
+              window.URL.revokeObjectURL(blob);
+            });
+          }).catch(error => console.log(error));
         }
-      }).catch(error => console.log(error));
+      }
     }
   }, {
     key: 'render',
@@ -288,7 +305,7 @@ let FileForm = function (_React$Component) {
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 142
+            lineNumber: 156
           }
         },
         React.createElement(
@@ -296,7 +313,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 143
+              lineNumber: 157
             }
           },
           React.createElement(
@@ -306,7 +323,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 144
+                lineNumber: 158
               }
             },
             'Upload'
@@ -318,7 +335,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 149
+                lineNumber: 163
               }
             },
             'Download'
@@ -339,7 +356,7 @@ let FileForm = function (_React$Component) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 155
+            lineNumber: 169
           }
         })
       );
