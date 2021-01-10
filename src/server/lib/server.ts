@@ -8,8 +8,8 @@ import * as api from './api'
 
 const listener = (req: http.IncomingMessage, res) => {
   const [domen, command] = req.url.substring(1).split('/');
-  
-  if (domen === 'api') {
+
+  if (domen === 'api') { 
     api[command](req, res);
   } else {
     const client = new Client({ req, res });

@@ -1,8 +1,10 @@
-import * as fs from "fs"; 
-import * as path from "path"; 
+import * as fs from "fs";
+import * as path from "path";
 import * as ws from 'ws';
 import { IncomingMessage } from 'http';
 import { logger } from './logger';
+import { generateToken } from './auth';
+import { listStorage } from "./storage";
 
 type ClientArgs = { req: IncomingMessage, res?, connection?: ws };
 
@@ -37,11 +39,22 @@ const arrayBufferToString = buffer => {
   return String.fromCharCode.apply(null, new Uint8Array(buffer));
 }
 
+const stringToArrayBuffer = s => {
+  const buf = new ArrayBuffer(s.length);
+  let bufView = new Uint8Array(buf);
+  for (let i = 0, strLen = s.length; i < strLen; i++) {
+    bufView[i] = s.charCodeAt(i);
+  }
+  return buf;
+};
+
 export class Client {
   private req
   private res
   private ip
   private connection
+  private incomingCount: number
+  private token: string
 
   constructor({ req, res, connection }: ClientArgs ) {
     this.req = req;
@@ -68,31 +81,48 @@ export class Client {
 
   async message(data) {
     try {
-      console.log(data);
-      const bufferView = new Uint8Array(data);
-      let nameBufferLen = 0;
-      let name = '';
+      if (typeof data == 'string') {
+        const jsonData = JSON.parse(data);
 
-      for (let i = 0; i < bufferView.byteLength; i++) {
-        if (bufferView[i] === 0) break;
-        nameBufferLen++;
-        name += String.fromCharCode(bufferView[i]);
+        if (typeof jsonData === 'number') {
+          this.incomingCount = jsonData;
+          this.token = generateToken();
+          fs.mkdirSync('./storage/' + this.token);
+          this.send(this.token);
+
+        } else if (typeof jsonData === 'object') {
+          if (jsonData.length === 1) {
+            // let link; и тип мы генерим тут между ними линки на файлы
+            // this.send(JSON.stringify({ list: listStorage(jsonData[0]), link }))
+            this.send(JSON.stringify(listStorage(jsonData[0])))
+          } else {
+            this.send(fs.readFileSync(`./storage/${jsonData[0]}/${jsonData[1]}`));
+          }
+        }
       }
+      else if (this.incomingCount > 0) {
+        const bufferView = new Uint8Array(data);
+        let nameBufferLen = 0;
+        let name = '';
 
-      const dataBuffer = new Uint8Array(bufferView.byteLength - nameBufferLen - 1);
+        for (let i = 0; i < bufferView.byteLength; i++) {
+          if (bufferView[i] === 0) break;
+          nameBufferLen++;
+          name += String.fromCharCode(bufferView[i]);
+        }
 
-      for (let i = nameBufferLen + 1; i < bufferView.byteLength; i++) {
-        dataBuffer[i - nameBufferLen - 1] = bufferView[i];
+        const dataBuffer = new Uint8Array(bufferView.byteLength - nameBufferLen - 1);
+
+        for (let i = nameBufferLen + 1; i < bufferView.byteLength; i++) {
+          dataBuffer[i - nameBufferLen - 1] = bufferView[i];
+        }
+
+        fs.writeFile(`./storage/${this.token}/${name}`, dataBuffer, (err) => {
+          if (err) throw err;
+        });
+
+        this.incomingCount--;
       }
-
-      console.log(name);
-      console.log(arrayBufferToString(dataBuffer));
-
-      fs.writeFile('./storage/' + name, dataBuffer, (err) => {
-        if (err) throw err;
-        console.log('ok');
-      });
-
     } catch (error) {
       console.error(error);
     }

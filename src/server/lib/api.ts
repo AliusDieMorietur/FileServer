@@ -4,7 +4,7 @@ import * as formidable from 'formidable'  ;
 import { readStorage, listStorage } from "./storage";
 
 const upload = (req, res) => {
-const token = generateToken();
+  const token = generateToken();
   fs.mkdirSync('./storage/' + token);
 
   const form = new formidable.IncomingForm();
