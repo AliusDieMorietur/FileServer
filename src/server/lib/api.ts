@@ -28,7 +28,6 @@ const upload = (req, res) => {
 const download = (req, res) => {
   req.on('data', data => {
     const parsed = JSON.parse(data.toString());
-    console.log(parsed[1]);
 
     if (parsed[1] == "") {
       res.writeHead(200, { 'content-type': 'application/json' });

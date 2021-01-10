@@ -353,42 +353,81 @@ let FileForm = function (_React$Component) {
     value: function download() {
       const socket = new WebSocket('ws://' + location.host);
       socket.addEventListener('open', () => {
-        socket.addEventListener('message', data => {
-          data.data.arrayBuffer().then(data => {
-            const bufferView = new Uint8Array(data);
-            let nameBufferLen = 0;
-            let name = '';
+        // socket.addEventListener('message', data => {
+        //   data.data.arrayBuffer().then(data => {
+        //     const bufferView = new Uint8Array(data);
+        //     let nameBufferLen = 0;
+        //     let name = '';
 
-            for (let i = 0; i < bufferView.byteLength; i++) {
-              if (bufferView[i] === 0) break;
-              console.log(name);
-              console.log(bufferView[i], String.fromCharCode(bufferView[i]));
-              nameBufferLen++;
-              name += String.fromCharCode(bufferView[i]);
-            }
-            const dataBuffer = new Uint8Array(bufferView.byteLength - nameBufferLen - 1);
+        //     for (let i = 0; i < bufferView.byteLength; i++) {
+        //       if (bufferView[i] === 0) break;
+        //       console.log(name);
+        //       console.log(bufferView[i], String.fromCharCode(bufferView[i]));
+        //       nameBufferLen++;
+        //       name += String.fromCharCode(bufferView[i]);
+        //     }
+        //     const dataBuffer = new Uint8Array(bufferView.byteLength - nameBufferLen - 1);
 
-            for (let i = nameBufferLen + 1; i < bufferView.byteLength; i++) {
-              dataBuffer[i - nameBufferLen - 1] = bufferView[i];
-            }
+        //     for (let i = nameBufferLen + 1; i < bufferView.byteLength; i++) {
+        //       dataBuffer[i - nameBufferLen - 1] = bufferView[i];
+        //     }
 
-            const newBlob = new Blob([dataBuffer]);
+        //     const newBlob = new Blob([dataBuffer]);
 
-            const blobUrl = window.URL.createObjectURL(newBlob);
+        //     const blobUrl = window.URL.createObjectURL(newBlob);
 
-            //probably possible to refactor that shit into proper links
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.setAttribute('download', name);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
+        //     //probably possible to refactor that shit into proper links
+        //     const link = document.createElement('a');
+        //     link.href = blobUrl;
+        //     link.setAttribute('download', name);
+        //     document.body.appendChild(link);
+        //     link.click();
+        //     link.parentNode.removeChild(link);
 
-            window.URL.revokeObjectURL(blob);
-          });
-        });
+        //     window.URL.revokeObjectURL(blob);
+        //   });
+        // });
 
-        for (const file of this.state.dataList) socket.send(JSON.stringify([this.state.input, file]));
+        // socket.addEventListener('message', dataBlob => {
+        //   const newBlob = new Blob([dataBlob.data]);
+
+        //   const blobUrl = window.URL.createObjectURL(newBlob);
+
+        //   // TODO: probably possible to refactor that shit into proper links
+        //   const link = document.createElement('a');
+        //   // event.target.href = blobUrl;
+        //   link.href = blobUrl;
+        //   link.setAttribute('download', file);
+        //   document.body.appendChild(link);
+        //   link.click();
+        //   link.parentNode.removeChild(link);
+
+        //   window.URL.revokeObjectURL(newBlob);
+        // });
+        // for (const file of this.state.dataList) {
+        // socket.send(JSON.stringify([this.state.input, file]));
+
+        for (const file of this.state.dataList) {
+          fetch('/api/download', {
+            method: 'POST',
+            body: JSON.stringify([this.state.input, file])
+          }).then(response => {
+            response.blob().then(blob => {
+              const newBlob = new Blob([blob]);
+
+              const blobUrl = window.URL.createObjectURL(newBlob);
+
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.setAttribute('download', file);
+              document.body.appendChild(link);
+              link.click();
+              link.parentNode.removeChild(link);
+
+              window.URL.revokeObjectURL(blob);
+            });
+          }).catch(error => console.log(error));
+        }
       });
     }
   }, {
@@ -399,7 +438,7 @@ let FileForm = function (_React$Component) {
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 221
+            lineNumber: 259
           }
         },
         React.createElement(
@@ -407,7 +446,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 222
+              lineNumber: 260
             }
           },
           React.createElement(
@@ -417,7 +456,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 223
+                lineNumber: 261
               }
             },
             'Upload'
@@ -429,7 +468,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 228
+                lineNumber: 266
               }
             },
             'Download'
@@ -452,7 +491,7 @@ let FileForm = function (_React$Component) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 234
+            lineNumber: 272
           }
         })
       );
