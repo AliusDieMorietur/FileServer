@@ -1,44 +1,18 @@
 import * as ws from 'ws';
 import * as http from 'http';
-import * as fs from 'fs';
-import * as path from 'path'
 import { threadId } from 'worker_threads';
 import { serverConfig } from '../config/server';
-import * as formidable from 'formidable'  ;
 import { Client } from './client';
 import { logger } from './logger';
- 
-
-const sessions = [];
+import * as api from './api'
 
 const listener = (req: http.IncomingMessage, res) => {
-  if (req.url === '/api/upload' && req.method.toLowerCase() === 'post') {
+  const [domen, command] = req.url.substring(1).split('/');
 
-    const token = 'zaplatka';
-    fs.mkdirSync('./storage/' + token);
-
-    const form = new formidable.IncomingForm(); 
-
-    form.parse(req, (err, fields, files) => {
-      if (err) throw err;
-
-      res.writeHead(200, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ ok: true, token }, null, 2));
-    });
-
-    form.on('fileBegin', (__name, file) => {
-      file.path = './storage/' + token + '/' + file.name;
-    });
-
-    form.on('file', (__name, file) => {
-      console.log('Uploaded ' + file.name);
-    });
-
-  } else {  
+  if (domen === 'api') { 
+    api[command](req, res);
+  } else {
     const client = new Client({ req, res });
-
-    // TODO call auth to generate new token for client
-
     client.static();
   }
 };
@@ -48,7 +22,7 @@ export class Server {
   ws = new ws.Server({ server: this.instance });
 
   constructor() {
-    const { ports } = serverConfig; 
+    const { ports } = serverConfig;
     const port = ports[threadId - 1];
     this.ws.on('connection', (connection, req) => {
       const client = new Client({ connection, req });
@@ -63,7 +37,7 @@ export class Server {
 
     // TODO read storage to save all available sessions
   }
-  
+
   async close() {
     //TODO graceful shutdown
     logger.log('close');

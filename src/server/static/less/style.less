@@ -71,6 +71,12 @@ ul {
       }
     }
   }
+
+  .available {
+    display: flex;
+    flex-direction: column;
+  }
+
   .tab {
     display: flex;
     flex-direction: column;
@@ -92,10 +98,10 @@ ul {
       transition: all 0.2s ease-out;
       &:hover {
         background-color: @font;
-        color: @background;;
+        color: @background;
       }
     }
-    
+
     #files {
       margin: 10px auto;
       width: 0.1px;
@@ -111,6 +117,12 @@ ul {
       li {
         margin: 10px;
         text-align: center;
+        a {
+          cursor: pointer;
+          &:hover {
+            border-bottom: 1px solid @font;
+          }
+        }
       }
     }
 
@@ -128,7 +140,9 @@ ul {
     }
 
     #token {
-      margin: 10px auto;
+      width: 350px;
+      text-align: center;
+      margin: 20px auto;
       padding: 6px 7.5px;
       background-color: @background;
       color: @font;
