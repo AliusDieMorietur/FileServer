@@ -19,7 +19,6 @@ export const generateToken = () => {
   return key;
 };
 
-
 const parseCookies = cookie => {
   const values = {};
   const items = cookie.split(';');

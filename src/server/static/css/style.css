@@ -66,6 +66,10 @@ ul li {
   color: #212121;
   background-color: #FFFFFF;
 }
+.form .available {
+  display: flex;
+  flex-direction: column;
+}
 .form .tab {
   display: flex;
   flex-direction: column;
@@ -106,6 +110,12 @@ ul li {
   margin: 10px;
   text-align: center;
 }
+.form .tab #file-list li a {
+  cursor: pointer;
+}
+.form .tab #file-list li a:hover {
+  border-bottom: 1px solid #FFFFFF;
+}
 .form .tab .buttons {
   display: flex;
   justify-content: center;
@@ -117,7 +127,9 @@ ul li {
   margin-left: 5px;
 }
 .form .tab #token {
-  margin: 10px auto;
+  width: 350px;
+  text-align: center;
+  margin: 20px auto;
   padding: 6px 7.5px;
   background-color: #212121;
   color: #FFFFFF;

@@ -1,18 +1,14 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from 'fs';
+import { promises as fsp } from 'fs';
+import * as path from 'path';
 import * as ws from 'ws';
 import { IncomingMessage } from 'http';
 import { logger } from './logger';
 import { generateToken } from './auth';
-import { listStorage } from "./storage";
+import { listStorage } from './storage';
 
 type ClientArgs = { req: IncomingMessage, res?, connection?: ws };
 
-const fsp = fs.promises;
-
-const ALPHA_UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const ALPHA_LOWER = 'abcdefghijklmnopqrstuvwxyz';
-const ALPHA = ALPHA_UPPER + ALPHA_LOWER;
 
 const MIME_TYPES = {
   html: 'text/html; charset=UTF-8',
@@ -92,8 +88,6 @@ export class Client {
 
         } else if (typeof jsonData === 'object') {
           if (jsonData.length === 1) {
-            // let link; и тип мы генерим тут между ними линки на файлы
-            // this.send(JSON.stringify({ list: listStorage(jsonData[0]), link }))
             this.send(JSON.stringify(listStorage(jsonData[0])))
           } else {
             this.send(fs.readFileSync(`./storage/${jsonData[0]}/${jsonData[1]}`));

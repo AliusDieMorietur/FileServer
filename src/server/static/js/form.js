@@ -1,6 +1,6 @@
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _jsxFileName = 'src/server/static/jsx_src/form.jsx';
+var _jsxFileName = 'src\\server\\static\\jsx_src\\form.jsx';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -33,8 +33,7 @@ function Tab(props) {
     'Check Available'
   ) : React.createElement(
     'div',
-    {
-      __self: this,
+    { className: 'available', __self: this,
       __source: {
         fileName: _jsxFileName,
         lineNumber: 7
@@ -64,7 +63,7 @@ function Tab(props) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 10
+            lineNumber: 11
           }
         },
         React.createElement(
@@ -72,7 +71,7 @@ function Tab(props) {
           { download: el, onClick: props.downloadFromLink, __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 13
+              lineNumber: 12
             }
           },
           el
@@ -231,19 +230,19 @@ let FileForm = function (_React$Component) {
       input: ''
     };
 
-    // for (const key of Object.keys(this)) {
-    //   if (typeof key === function) {
-    //     this[key] = key.bind(this) || key = key.bind(this) //хз как правильно
-    //   }
-    // }
+    for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(_this))) {
+      if (!["constructor", "render"].includes(key)) {
+        _this[key] = _this[key].bind(_this);
+      }
+    }
 
-    _this.fileUploadChange = _this.fileUploadChange.bind(_this);
-    _this.tokenInputChange = _this.tokenInputChange.bind(_this);
-    _this.fileSelect = _this.fileSelect.bind(_this);
-    _this.upload = _this.upload.bind(_this);
-    _this.download = _this.download.bind(_this);
-    _this.downloadFromLink = _this.downloadFromLink.bind(_this);
-    _this.getFilenames = _this.getFilenames.bind(_this);
+    // this.fileUploadChange = this.fileUploadChange.bind(this);
+    // this.tokenInputChange = this.tokenInputChange.bind(this);
+    // this.fileSelect = this.fileSelect.bind(this);
+    // this.upload = this.upload.bind(this);
+    // this.download = this.download.bind(this);
+    // this.downloadFromLink = this.downloadFromLink.bind(this);
+    // this.getFilenames = this.getFilenames.bind(this);
     return _this;
   }
 
@@ -425,7 +424,7 @@ let FileForm = function (_React$Component) {
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 246
+            lineNumber: 247
           }
         },
         React.createElement(
@@ -433,7 +432,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 247
+              lineNumber: 248
             }
           },
           React.createElement(
@@ -443,7 +442,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 248
+                lineNumber: 249
               }
             },
             'Upload'
@@ -455,7 +454,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 253
+                lineNumber: 254
               }
             },
             'Download'
@@ -478,7 +477,7 @@ let FileForm = function (_React$Component) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 259
+            lineNumber: 260
           }
         })
       );
