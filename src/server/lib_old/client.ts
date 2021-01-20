@@ -1,6 +1,14 @@
 import * as fs from 'fs';
 import { promises as fsp } from 'fs';
 import * as path from 'path';
+import * as ws from 'ws';
+import { IncomingMessage } from 'http';
+import { logger } from './logger';
+import { generateToken } from './auth';
+import { listStorage } from './storage';
+
+type ClientArgs = { req: IncomingMessage, res?, connection?: ws };
+
 const MIME_TYPES = {
   html: 'text/html; charset=UTF-8',
   js: 'application/javascript; charset=UTF-8',
@@ -18,6 +26,7 @@ const loadFile = async (name: string) => {
   try {
     return await fsp.readFile(filePath);
   } catch (error) {
+    logger.error(error);
   }
 };
 

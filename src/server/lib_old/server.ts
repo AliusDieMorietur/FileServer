@@ -2,11 +2,14 @@ import * as ws from 'ws';
 import * as http from 'http';
 import { threadId } from 'worker_threads';
 import { serverConfig } from '../config/server';
+import { Client } from './client';
+import { logger } from './logger';
+import * as api from './api'
 
 const listener = (req: http.IncomingMessage, res) => {
   const [domen, command] = req.url.substring(1).split('/');
   if (domen === 'api') { 
-    // api[command](req, res);
+    api[command](req, res);
   } else {
     const client = new Client({ req, res });
     client.static();

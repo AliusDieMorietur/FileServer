@@ -1,33 +1,38 @@
-import { serverConfig } from '../config/server';
-import { Worker } from 'worker_threads'; 
+import * as fs from 'fs';
+import { promises as fsp } from 'fs';
+import * as path from 'path';
+import { logger } from './logger';
 
-export class App {
-  count = serverConfig.ports.length
-  workers: Worker[] = []
-  
-  private stop() {
-    //TODO sudden crash, zaplatka for now
-    if (this.workers) {
-      for (const worker of this.workers) {
-        worker.postMessage({ name: 'stop' });
-      }
-    }
-    process.exit(0);
-  };
-
-  private startWorker(id: number) {
-    const worker = new Worker('./lib/worker.js');
-    this.workers[id] = worker;
-    worker.on('exit', code => {
-      if (code !== 0) this.startWorker(id);
-    });
-  };
-
-  async start() {
-    for (let id = 0; id < this.count; id++) this.startWorker(id);
-
-    process.on('SIGINT', this.stop);
-    process.on('SIGTERM', this.stop);
+class App {
+  logger = logger;
+  static = new Map();
+  constructor() {
+    new Promise((resolve) => {
+      (async () => {
+        await this.loadDirectory('src/server/static/');
+        resolve(1);
+      })();
+    }).then(data => {
+      console.log(this.static);
+      console.log(this.static.get('/index.html'));
+    })
   }
-  
+
+  async loadFile(filePath: string, storage: Map<String, Buffer>) {
+    const file = await fsp.readFile(filePath);
+    storage.set(filePath, file);
+  }
+
+  async loadDirectory(dirPath: string) {
+    const files = await fsp.readdir(dirPath, { withFileTypes: true });
+    console.log(files); 
+    for (const file of files) {
+      if (file.name.startsWith('.')) continue;
+      const filePath = path.join(dirPath, file.name);
+      if (file.isDirectory()) await this.loadDirectory(filePath);
+      else await this.loadFile(filePath, this.static);
+    }
+  }
 }
+
+new App()
