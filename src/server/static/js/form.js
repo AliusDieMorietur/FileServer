@@ -1,6 +1,6 @@
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _jsxFileName = 'src\\server\\static\\jsx_src\\form.jsx';
+var _jsxFileName = 'src/server/static/jsx_src/form.jsx';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -235,14 +235,6 @@ let FileForm = function (_React$Component) {
         _this[key] = _this[key].bind(_this);
       }
     }
-
-    // this.fileUploadChange = this.fileUploadChange.bind(this);
-    // this.tokenInputChange = this.tokenInputChange.bind(this);
-    // this.fileSelect = this.fileSelect.bind(this);
-    // this.upload = this.upload.bind(this);
-    // this.download = this.download.bind(this);
-    // this.downloadFromLink = this.downloadFromLink.bind(this);
-    // this.getFilenames = this.getFilenames.bind(this);
     return _this;
   }
 
@@ -272,8 +264,6 @@ let FileForm = function (_React$Component) {
   }, {
     key: 'upload',
     value: function upload() {
-      const data = new FormData();
-
       socket.onmessage = token => {
         this.setState({ token: token.data });
       };
@@ -325,7 +315,6 @@ let FileForm = function (_React$Component) {
 
         // TODO: probably possible to refactor that shit into proper links
         const link = document.createElement('a');
-        // event.target.href = blobUrl;
         link.href = blobUrl;
         link.setAttribute('download', event.target.innerText);
         document.body.appendChild(link);
@@ -340,59 +329,6 @@ let FileForm = function (_React$Component) {
   }, {
     key: 'download',
     value: function download() {
-      // socket.addEventListener('message', data => {
-      //   data.data.arrayBuffer().then(data => {
-      //     const bufferView = new Uint8Array(data);
-      //     let nameBufferLen = 0;
-      //     let name = '';
-
-      //     for (let i = 0; i < bufferView.byteLength; i++) {
-      //       if (bufferView[i] === 0) break;
-      //       console.log(name);
-      //       console.log(bufferView[i], String.fromCharCode(bufferView[i]));
-      //       nameBufferLen++;
-      //       name += String.fromCharCode(bufferView[i]);
-      //     }
-      //     const dataBuffer = new Uint8Array(bufferView.byteLength - nameBufferLen - 1);
-
-      //     for (let i = nameBufferLen + 1; i < bufferView.byteLength; i++) {
-      //       dataBuffer[i - nameBufferLen - 1] = bufferView[i];
-      //     }
-
-      //     const newBlob = new Blob([dataBuffer]);
-
-      //     const blobUrl = window.URL.createObjectURL(newBlob);
-
-      //     //probably possible to refactor that shit into proper links
-      //     const link = document.createElement('a');
-      //     link.href = blobUrl;
-      //     link.setAttribute('download', name);
-      //     document.body.appendChild(link);
-      //     link.click();
-      //     link.parentNode.removeChild(link);
-
-      //     window.URL.revokeObjectURL(blob);
-      //   });
-      // });
-
-      // socket.addEventListener('message', dataBlob => {
-      //   const newBlob = new Blob([dataBlob.data]);
-
-      //   const blobUrl = window.URL.createObjectURL(newBlob);
-
-      //   // TODO: probably possible to refactor that shit into proper links
-      //   const link = document.createElement('a');
-      //   // event.target.href = blobUrl;
-      //   link.href = blobUrl;
-      //   link.setAttribute('download', file);
-      //   document.body.appendChild(link);
-      //   link.click();
-      //   link.parentNode.removeChild(link);
-
-      //   window.URL.revokeObjectURL(newBlob);
-      // });
-      // for (const file of this.state.dataList) {
-      // socket.send(JSON.stringify([this.state.input, file]));
 
       for (const file of this.state.dataList) {
         fetch('/api/download', {
@@ -424,7 +360,7 @@ let FileForm = function (_React$Component) {
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 247
+            lineNumber: 183
           }
         },
         React.createElement(
@@ -432,7 +368,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 248
+              lineNumber: 184
             }
           },
           React.createElement(
@@ -442,7 +378,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 249
+                lineNumber: 185
               }
             },
             'Upload'
@@ -454,7 +390,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 254
+                lineNumber: 190
               }
             },
             'Download'
@@ -477,7 +413,7 @@ let FileForm = function (_React$Component) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 260
+            lineNumber: 196
           }
         })
       );

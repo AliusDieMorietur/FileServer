@@ -1,5 +1,4 @@
-import { App } from './lib/app';
+import { Exec } from './lib/exec';
 
-const myApp = new App();
-console.log();
-myApp.start();
+const app = new Exec();
+app.start()

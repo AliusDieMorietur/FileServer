@@ -21,7 +21,7 @@ class Logger {
     const now = new Date().toISOString();
     const date = now.substring(0, DATETIME_LENGTH);
     const color = COLORS[level];
-    const line = date + '\t' + s + '\n';
+    const line = `${date} [${level}]${s}\n`;
 
     console.log(color + line + '\x1b[0m');
     this.stream.write(line);
