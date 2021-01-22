@@ -43,6 +43,7 @@ ul li {
 .form .tabs {
   display: flex;
   justify-content: center;
+  margin: 10px 0px;
 }
 .form .tabs .tab-btn {
   cursor: pointer;
@@ -70,16 +71,16 @@ ul li {
   display: flex;
   flex-direction: column;
 }
-.form .tab {
+.form .tabulator .tab {
   display: flex;
   flex-direction: column;
 }
-.form .tab .form-title {
+.form .tabulator .tab .form-title {
   text-align: center;
   font-size: 20px;
-  margin: 20px 0px 10px 0px;
+  margin: 10px 0px 10px 0px;
 }
-.form .tab .form-btn {
+.form .tabulator .tab .form-btn {
   cursor: pointer;
   background-color: #212121;
   color: #FFFFFF;
@@ -90,11 +91,11 @@ ul li {
   border-radius: 3px;
   transition: all 0.2s ease-out;
 }
-.form .tab .form-btn:hover {
+.form .tabulator .tab .form-btn:hover {
   background-color: #FFFFFF;
   color: #212121;
 }
-.form .tab #files {
+.form .tabulator .tab #files {
   margin: 10px auto;
   width: 0.1px;
   height: 0.1px;
@@ -103,30 +104,30 @@ ul li {
   position: absolute;
   z-index: -1;
 }
-.form .tab #file-list {
+.form .tabulator .tab #file-list {
   margin: 0px auto;
 }
-.form .tab #file-list li {
+.form .tabulator .tab #file-list li {
   margin: 10px;
   text-align: center;
 }
-.form .tab #file-list li a {
+.form .tabulator .tab #file-list li a {
   cursor: pointer;
 }
-.form .tab #file-list li a:hover {
+.form .tabulator .tab #file-list li a:hover {
   border-bottom: 1px solid #FFFFFF;
 }
-.form .tab .buttons {
+.form .tabulator .tab .buttons {
   display: flex;
   justify-content: center;
 }
-.form .tab .buttons .form-btn:first-child {
+.form .tabulator .tab .buttons .form-btn:first-child {
   margin-right: 5px;
 }
-.form .tab .buttons .form-btn:last-child {
+.form .tabulator .tab .buttons .form-btn:last-child {
   margin-left: 5px;
 }
-.form .tab #token {
+.form .tabulator .tab #token {
   width: 350px;
   text-align: center;
   margin: 20px auto;
@@ -136,4 +137,10 @@ ul li {
   border: 1px solid #ADADAD;
   border-radius: 3px;
   font-size: 17px;
+}
+.form .tabulator .error-box {
+  color: #E62737;
+  text-align: center;
+  font-size: 20px;
+  margin: 20px 0px 10px 0px;
 }

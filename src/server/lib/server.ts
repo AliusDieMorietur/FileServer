@@ -30,7 +30,7 @@ export class Server {
 		const { ports } = serverConfig;
     const port = ports[threadId - 1];
     this.ws.on('connection', (connection, req) => {
-      const channel = new Channel(req, connection, application);
+      const channel = new Channel(connection, application);
       connection.on('message', (data) => {
         channel.message(data);
       })

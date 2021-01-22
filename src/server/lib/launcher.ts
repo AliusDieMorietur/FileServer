@@ -1,7 +1,7 @@
 import { serverConfig } from '../config/server';
 import { Worker } from 'worker_threads'; 
 
-export class Exec {
+export class Launcher {
   count = serverConfig.ports.length
   workers: Worker[] = []
   

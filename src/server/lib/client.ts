@@ -35,8 +35,8 @@ export class Client {
       this.application.logger.log(`${url} Not Found`);
       this.res.writeHead(404, 'Not Found');
       this.res.end('404: File Not Found!');
-    } catch (error) {
-      this.application.logger.log(error);
+    } catch (err) {
+      this.application.logger.log(err);
     }
   }
 }

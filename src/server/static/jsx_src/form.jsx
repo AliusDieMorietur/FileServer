@@ -1,57 +1,39 @@
-const socket = new WebSocket('ws://' + location.host);
+const downloadFile = dataBlob => {
+  const newBlob = new Blob([dataBlob.data]);
 
-function Tab(props) {
-  let token = props.token !== '' ? <h1 className="form-title">Your token: {props.token}</h1> : '';
-  let downloadButton = props.fileList.length === 0 ?
-    <button className="form-btn" onClick={props.getFilenames}>Check Available</button>
-    : <div className="available">
-        <h1 className="form-title">Available:</h1>
-        <ul id="file-list">
-          {props.fileList.map(el => 
-            <li>
-              <a download={el} onClick = {props.downloadFromLink}>{el}</a>
-            </li>
-          )}
-        </ul>
-        <button className="form-btn" onClick={props.download}>Download All</button>
-      </div>;
+  const blobUrl = window.URL.createObjectURL(newBlob);
 
-  let uploadTab = <div className="upload tab">
-                    <input id="files" type="file" value = { props.value } onChange = { props.change } multiple></input>
-                    { token }
-                    <h1 className="form-title">Chosen:</h1>
-                    <ul id="file-list">
-                      { props.chosen.map(el => <li>{ el }</li>) }
-                    </ul>
-                    <div className="buttons">
-                      <label className="input-btn form-btn" for="files">Choose files</label>
-                      <button className="form-btn" onClick = { props.upload }>Upload</button>
-                    </div>
-                  </div>;
+  // TODO: probably possible to refactor that shit into proper links
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.setAttribute('download', event.target.innerText);
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode.removeChild(link);
 
-  let downloadTab = <div className="download tab">
-                      <h1 className="form-title">Enter Token</h1>
-                      <input id="token" type="text" value = { props.input } onChange = {props.tokenInputChange}/>
-                      {downloadButton}
-                    </div>;
+  window.URL.revokeObjectURL(newBlob);
+};
 
-  switch(props.tab) {
-    case 'upload':
-      return uploadTab;
-      break;
-    case 'download':
-      return downloadTab;
-      break;
-  }
+const showError = (mediator, error) => {     
+  mediator.setState({ error });
+  setTimeout(() => mediator.setState({ error: '' }), 5000);
 }
 
-const stringToArrayBuffer = s => {
-  const buf = new ArrayBuffer(s.length);
-  let bufView = new Uint8Array(buf);
-  for (let i = 0, strLen = s.length; i < strLen; i++) {
-    bufView[i] = s.charCodeAt(i);
+const actions = {
+  'token': (mediator, packet) => {
+    const { token } = packet;
+    mediator.setState({ token });
+  },
+  'transfer-error': mediator => showError(mediator, 'Transfer error. Try again.'),
+  'non-existent-token': mediator => showError(mediator, 'Wrong token. Try again.'),
+  'available-files': (mediator, packet) => {
+    let { dataList } = packet;
+    dataList = Object.keys(dataList);
+    mediator.setState({ dataList });
+  },
+  'files': (mediator, packet) => {
+
   }
-  return buf;
 };
 
 class FileForm extends React.Component {
@@ -65,8 +47,30 @@ class FileForm extends React.Component {
       filesSelected: [],
       dataList: [],
       input: '',
+      error: '',
+      currentFile: '',
+      buffers: []
     };
 
+    this.actions = Object
+      .keys(actions)
+      .reduce((acc, cur) => (acc[cur] = actions[cur].bind(this), acc),{});
+
+    this.socket = new WebSocket('ws://' + location.host);
+    this.socket.addEventListener('message', event => {
+      try {
+        const { data } = event;
+        if (typeof data === 'string') {
+          const packet = JSON.parse(data);
+          const { msg } = packet;
+          if (this.actions[msg]) this.actions[msg](this, packet)        
+        } else {
+          this.state.buffers.push(data);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    });    
 
     for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(this))) {
       if (!["constructor", "render"].includes(key)) {
@@ -77,7 +81,7 @@ class FileForm extends React.Component {
 
   fileUploadChange(event) {
     const chosen = [];
-    for (const file of  event.target.files) { chosen.push(file.name); };
+    for (const file of event.target.files) { chosen.push(file.name); };
     this.setState({ files: event.target.files, chosen });
   }
 
@@ -94,67 +98,32 @@ class FileForm extends React.Component {
   }
 
   upload() {
-    socket.onmessage = token => { this.setState({ token: token.data }); };
-    socket.send(JSON.stringify(this.state.files.length));
-
-    for (const file of this.state.files) {
-      const reader = new FileReader();
-
-      reader.addEventListener('load', event => {
-        const fileBuffer = event.target.result;
-        const fileBufferView = new Uint8Array(fileBuffer);
-        const { name } = file;
-        const nameBuffer = stringToArrayBuffer(name + '\0');
-        const nameBufferView = new Uint8Array(nameBuffer);
-        const newBufferLen = fileBuffer.byteLength + nameBuffer.byteLength;
-        let newBuffer = new ArrayBuffer(newBufferLen);
-        let newBufferView = new Uint8Array(newBuffer);
-
-        for (let i = 0; i < nameBuffer.byteLength; i++) {
-          newBufferView[i] =  nameBufferView[i];
-        }
-
-        for (let i = nameBuffer.byteLength; i < newBufferLen; i++) {
-          newBufferView[i] = fileBufferView[i - nameBuffer.byteLength];
-        }
-
-        socket.send(newBuffer);
-      });
-
-      reader.readAsArrayBuffer(file);
-    };
+    this.setState({ token: 'loading...' });
+    const list = [];
+    for (const file of this.state.files) list.push(file.name);
+    this.socket.send(JSON.stringify({ msg: 'file-names', list }));
+    for (const file of this.state.files) this.socket.send(file);
+    this.socket.send(JSON.stringify({ msg: 'done' }));
   }
 
   getFilenames() {
-    socket.onmessage = data => {
-      this.setState({ dataList: JSON.parse(data.data) });
-    };
-
-    socket.send(JSON.stringify([this.state.input]));
+    this.socket.send(JSON.stringify({ msg: 'available-files', token: this.state.input }));
   }
 
   downloadFromLink(event) {
-    socket.onmessage = dataBlob => {
-      const newBlob = new Blob([dataBlob.data]);
-
-      const blobUrl = window.URL.createObjectURL(newBlob);
-
-      // TODO: probably possible to refactor that shit into proper links
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.setAttribute('download', event.target.innerText);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-
-      window.URL.revokeObjectURL(newBlob);
-    };
-
-    socket.send(JSON.stringify([this.state.input, event.target.innerText]));
+    this.setState({ currentFile: event.target.innerText });
+    this.socket.send(JSON.stringify({ 
+      msg: 'download', 
+      token: this.state.input, 
+      file: event.target.innerText 
+    }));
   }
 
   download() {
-    
+    this.socket.send(JSON.stringify({ 
+      msg: 'download', 
+      token: this.state.input,
+    }));
     for (const file of this.state.dataList) {
       fetch('/api/download', {
         method: 'POST',
@@ -207,6 +176,7 @@ class FileForm extends React.Component {
           token = { this.state.token }
           getFilenames = { this.getFilenames }
           fileList = { this.state.dataList }
+          error = { this.state.error }
         />
       </div>
     );

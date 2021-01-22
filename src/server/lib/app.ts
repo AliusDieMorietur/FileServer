@@ -8,7 +8,6 @@ const STATIC_PATH = path.join(process.cwd(), './static');
 const toUnix = filePath => 
   process.platform === 'win32' 
     ? filePath
-      .slice(STATIC_PATH.length)
       .split(path.sep)
       .join(path.posix.sep)
     : filePath;
@@ -25,11 +24,11 @@ export class App {
     try {
       const file = await fsp.readFile(filePath);
       storage.set(
-        toUnix(filePath),
+        toUnix(filePath.slice(STATIC_PATH.length)),
         file
       );
-    } catch (error) {
-      this.logger.error(error);
+    } catch (err) {
+      this.logger.error(err);
     }
   }
 
@@ -42,8 +41,8 @@ export class App {
         if (file.isDirectory()) await this.loadDirectory(filePath);
         else await this.loadFile(filePath, this.static);
       }
-    } catch (error) {
-      this.logger.error(error);
+    } catch (err) {
+      this.logger.error(err);
     }
   }
 
