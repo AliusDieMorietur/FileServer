@@ -8,40 +8,17 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-const downloadFile = dataBlob => {
+const downloadFile = (name, dataBlob) => {
   const newBlob = new Blob([dataBlob.data]);
-
   const blobUrl = window.URL.createObjectURL(newBlob);
-
   // TODO: probably possible to refactor that shit into proper links
   const link = document.createElement('a');
   link.href = blobUrl;
-  link.setAttribute('download', event.target.innerText);
+  link.setAttribute('download', name);
   document.body.appendChild(link);
   link.click();
   link.parentNode.removeChild(link);
-
   window.URL.revokeObjectURL(newBlob);
-};
-
-const showError = (mediator, error) => {
-  mediator.setState({ error });
-  setTimeout(() => mediator.setState({ error: '' }), 5000);
-};
-
-const actions = {
-  'token': (mediator, packet) => {
-    const { token } = packet;
-    mediator.setState({ token });
-  },
-  'transfer-error': mediator => showError(mediator, 'Transfer error. Try again.'),
-  'non-existent-token': mediator => showError(mediator, 'Wrong token. Try again.'),
-  'available-files': (mediator, packet) => {
-    let { dataList } = packet;
-    dataList = Object.keys(dataList);
-    mediator.setState({ dataList });
-  },
-  'files': (mediator, packet) => {}
 };
 
 let FileForm = function (_React$Component) {
@@ -60,27 +37,14 @@ let FileForm = function (_React$Component) {
       filesSelected: [],
       dataList: [],
       input: '',
-      error: '',
-      currentFile: '',
-      buffers: []
+      error: ''
     };
 
-    _this.actions = Object.keys(actions).reduce((acc, cur) => (acc[cur] = actions[cur].bind(_this), acc), {});
+    _this.buffers = [];
 
-    _this.socket = new WebSocket('ws://' + location.host);
-    _this.socket.addEventListener('message', event => {
-      try {
-        const { data } = event;
-        if (typeof data === 'string') {
-          const packet = JSON.parse(data);
-          const { msg } = packet;
-          if (_this.actions[msg]) _this.actions[msg](_this, packet);
-        } else {
-          _this.state.buffers.push(data);
-        }
-      } catch (err) {
-        console.log(err);
-      }
+    _this.transport = new Transport(location.host, buffer => {
+      console.log(buffer);
+      _this.buffers.push(buffer);
     });
 
     for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(_this))) {
@@ -92,6 +56,12 @@ let FileForm = function (_React$Component) {
   }
 
   _createClass(FileForm, [{
+    key: 'showError',
+    value: function showError(err) {
+      this.setState({ error: err });
+      setTimeout(() => this.setState({ error: '' }), 5000);
+    }
+  }, {
     key: 'fileUploadChange',
     value: function fileUploadChange(event) {
       const chosen = [];
@@ -120,53 +90,38 @@ let FileForm = function (_React$Component) {
       this.setState({ token: 'loading...' });
       const list = [];
       for (const file of this.state.files) list.push(file.name);
-      this.socket.send(JSON.stringify({ msg: 'file-names', list }));
-      for (const file of this.state.files) this.socket.send(file);
-      this.socket.send(JSON.stringify({ msg: 'done' }));
+      for (const file of this.state.files) this.transport.bufferCall(file);
+      this.transport.socketCall('file-names', { list }).then(token => this.setState({ token })).catch(this.showError);
     }
   }, {
     key: 'getFilenames',
     value: function getFilenames() {
-      this.socket.send(JSON.stringify({ msg: 'available-files', token: this.state.input }));
+      this.transport.socketCall('available-files', { token: this.state.input }).then(list => {
+        let dataList = Object.keys(list);
+        this.setState({ dataList });
+      }).catch(this.showError);
     }
   }, {
     key: 'downloadFromLink',
     value: function downloadFromLink(event) {
-      this.setState({ currentFile: event.target.innerText });
-      this.socket.send(JSON.stringify({
-        msg: 'download',
+      this.transport.socketCall('download', {
         token: this.state.input,
-        file: event.target.innerText
-      }));
+        files: [event.target.innerText]
+      }).then(files => {
+        for (let i = 0; i < files.length; i++) downloadFile(files[i], this.buffers[i]);
+        this.buffers = [];
+      }).catch(this.showError);
     }
   }, {
     key: 'download',
     value: function download() {
-      this.socket.send(JSON.stringify({
-        msg: 'download',
-        token: this.state.input
-      }));
-      for (const file of this.state.dataList) {
-        fetch('/api/download', {
-          method: 'POST',
-          body: JSON.stringify([this.state.input, file])
-        }).then(response => {
-          response.blob().then(blob => {
-            const newBlob = new Blob([blob]);
-
-            const blobUrl = window.URL.createObjectURL(newBlob);
-
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.setAttribute('download', file);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-
-            window.URL.revokeObjectURL(blob);
-          });
-        }).catch(error => console.log(error));
-      }
+      this.transport.socketCall('download', {
+        token: this.state.input,
+        files: this.state.dataList
+      }).then(files => {
+        for (let i = 0; i < files.length; i++) downloadFile(files[i], this.buffers[i]);
+        this.buffers = [];
+      }).catch(this.showError);
     }
   }, {
     key: 'render',
@@ -176,7 +131,7 @@ let FileForm = function (_React$Component) {
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 152
+            lineNumber: 112
           }
         },
         React.createElement(
@@ -184,7 +139,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 153
+              lineNumber: 113
             }
           },
           React.createElement(
@@ -194,7 +149,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 154
+                lineNumber: 114
               }
             },
             'Upload'
@@ -206,7 +161,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 159
+                lineNumber: 119
               }
             },
             'Download'
@@ -230,7 +185,7 @@ let FileForm = function (_React$Component) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 165
+            lineNumber: 125
           }
         })
       );

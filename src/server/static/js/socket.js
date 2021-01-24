@@ -1,24 +1,27 @@
 class Transport {
-  constructor(host) {
+  constructor(host, bufferConstruct) {
     this.socket = new WebSocket('ws://' + host);
-    this.api = {};
     this.callId = 0;
     this.calls = new Map();
     this.socket.addEventListener('message', ({ data }) => {
       try {
-        const packet = JSON.parse(data);
-        const { callId } = packet
-        const promised = this.calls.get(callId);
-        if (!promised) return;
-        const [resolve, reject] = promised;
-        if (packet.error) {
-          const { code, message } = packet.error;
-          const error = new Error(message);
-          error.code = code;
-          reject(error);
-          return;
+        if (typeof data === 'string') {
+          const packet = JSON.parse(data);
+          const { callId } = packet
+          const promised = this.calls.get(callId);
+          if (!promised) return;
+          const [resolve, reject] = promised;
+          if (packet.error) {
+            const { code, message } = packet.error;
+            const error = new Error(message);
+            error.code = code;
+            reject(error);
+            return;
+          }
+          resolve(packet.result);
+        } else {
+          bufferConstruct(data);
         }
-        resolve(packet.result);
       } catch (err) {
         console.error(err);
       }
@@ -32,21 +35,17 @@ class Transport {
     });
   }
 
-  async load(...methods) {
-    for (const methodName of methods) {
-      this.api[methodName] = this.socketCall(methodName);
-    }
+  async socketCall(msg, args) {
+    const callId = ++this.callId;
+    await this.ready();
+    return new Promise((resolve, reject) => {
+      this.calls.set(callId, [resolve, reject]);
+      const packet = { call: callId, msg, args };
+      this.socket.send(JSON.stringify(packet));
+    });
   }
 
-  socketCall(methodName) {
-    return async (...args) => {
-      const callId = ++this.callId;
-      await this.ready();
-      return new Promise((resolve, reject) => {
-        this.calls.set(callId, [resolve, reject]);
-        const packet = { call: callId, [methodName]: args };
-        this.socket.send(JSON.stringify(packet));
-      });
-    };
+  bufferCall(buffer) {
+    this.socket.send(buffer);
   }
 };
