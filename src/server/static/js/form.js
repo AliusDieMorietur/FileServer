@@ -40,10 +40,10 @@ let FileForm = function (_React$Component) {
       error: ''
     };
 
+    _this.timer = null;
     _this.buffers = [];
 
     _this.transport = new Transport(location.host, buffer => {
-      console.log(buffer);
       _this.buffers.push(buffer);
     });
 
@@ -58,8 +58,9 @@ let FileForm = function (_React$Component) {
   _createClass(FileForm, [{
     key: 'showError',
     value: function showError(err) {
-      this.setState({ error: err });
-      setTimeout(() => this.setState({ error: '' }), 5000);
+      this.setState({ error: err.message });
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = setTimeout(() => this.setState({ error: '' }), 5000);
     }
   }, {
     key: 'fileUploadChange',
@@ -87,37 +88,32 @@ let FileForm = function (_React$Component) {
   }, {
     key: 'upload',
     value: function upload() {
+      if (this.state.chosen.length === 1 && this.state.chosen[0] === 'None') {
+        this.showError(new Error('Nothing selected. Select, then upload'));
+        return;
+      };
       this.setState({ token: 'loading...' });
       const list = [];
       for (const file of this.state.files) list.push(file.name);
       for (const file of this.state.files) this.transport.bufferCall(file);
-      this.transport.socketCall('file-names', { list }).then(token => this.setState({ token })).catch(this.showError);
+      this.transport.socketCall('upload', { list }).then(token => this.setState({ token })).catch(this.showError);
     }
   }, {
     key: 'getFilenames',
     value: function getFilenames() {
-      this.transport.socketCall('available-files', { token: this.state.input }).then(list => {
-        let dataList = Object.keys(list);
-        this.setState({ dataList });
-      }).catch(this.showError);
-    }
-  }, {
-    key: 'downloadFromLink',
-    value: function downloadFromLink(event) {
-      this.transport.socketCall('download', {
-        token: this.state.input,
-        files: [event.target.innerText]
-      }).then(files => {
-        for (let i = 0; i < files.length; i++) downloadFile(files[i], this.buffers[i]);
-        this.buffers = [];
-      }).catch(this.showError);
+      if (this.state.input.length === 0) {
+        this.showError(new Error('Enter valid token please'));
+        return;
+      };
+      this.transport.socketCall('available-files', { token: this.state.input }).then(dataList => this.setState({ dataList })).catch(this.showError);
     }
   }, {
     key: 'download',
-    value: function download() {
+    value: function download(event) {
+      const files = event.target.innerText === 'Download All' ? this.state.dataList : [event.target.innerText];
       this.transport.socketCall('download', {
-        token: this.state.input,
-        files: this.state.dataList
+        token: this.state.input.trim(),
+        files
       }).then(files => {
         for (let i = 0; i < files.length; i++) downloadFile(files[i], this.buffers[i]);
         this.buffers = [];
@@ -131,7 +127,7 @@ let FileForm = function (_React$Component) {
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 112
+            lineNumber: 108
           }
         },
         React.createElement(
@@ -139,7 +135,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 113
+              lineNumber: 109
             }
           },
           React.createElement(
@@ -149,7 +145,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 114
+                lineNumber: 110
               }
             },
             'Upload'
@@ -161,7 +157,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 119
+                lineNumber: 115
               }
             },
             'Download'
@@ -174,7 +170,6 @@ let FileForm = function (_React$Component) {
           chosen: this.state.chosen,
           upload: this.upload,
           download: this.download,
-          downloadFromLink: this.downloadFromLink,
           input: this.state.input,
           tokenInputChange: this.tokenInputChange,
           fileSelect: this.fileSelect,
@@ -185,9 +180,19 @@ let FileForm = function (_React$Component) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 125
+            lineNumber: 121
           }
-        })
+        }),
+        React.createElement(
+          'h1',
+          { className: 'error-box', __self: this,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 136
+            }
+          },
+          this.state.error
+        )
       );
     }
   }]);

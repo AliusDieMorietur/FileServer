@@ -1,5 +1,6 @@
 import { serverConfig } from '../config/server';
 import { Worker } from 'worker_threads'; 
+import { App } from './app';
 
 export class Launcher {
   count = serverConfig.ports.length
@@ -23,6 +24,8 @@ export class Launcher {
   };
 
   async start() {
+    const application = new App();
+    application.clearExpired();
     for (let id = 0; id < this.count; id++) this.startWorker(id);
 
     process.on('SIGINT', this.stop);

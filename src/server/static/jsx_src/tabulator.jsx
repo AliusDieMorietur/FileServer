@@ -13,7 +13,7 @@ class Tab extends React.Component {
 					<ul id="file-list">
 						{this.props.fileList.map(el => 
 							<li>
-								<a download={el} onClick = {this.props.downloadFromLink}>{el}</a>
+								<a download={el} onClick = {this.props.download}>{el}</a>
 							</li>
 						)}
 					</ul>
@@ -39,10 +39,8 @@ class Tab extends React.Component {
 												{downloadButton}
 											</div>;
 	
-		let tab = this.props.tab === 'upload' ? uploadTab : downloadTab;
 		return  <div className="tabulator">
-								{tab}
-								<h1 className="error-box">{this.props.error}</h1>
+							{this.props.tab === 'upload' ? uploadTab : downloadTab}
 						</div>
 	}
 }

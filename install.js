@@ -24,5 +24,4 @@ copy('./src/server/static', './target/server/static', ['less', 'jsx_src']);
 fs.mkdirSync("./target/server/storage", { recursive: true });
 fs.mkdirSync("./target/server/logs", { recursive: true });
 fs.appendFileSync("./target/server/logs/log.txt", "");
-fs.appendFileSync("./target/server/names.json", "");
 console.log();

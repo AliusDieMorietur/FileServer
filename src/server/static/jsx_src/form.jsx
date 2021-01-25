@@ -25,10 +25,10 @@ class FileForm extends React.Component {
       error: ''
     };
 
+    this.timer = null;
     this.buffers = [];
 
     this.transport = new Transport(location.host, buffer => {
-      console.log(buffer);
       this.buffers.push(buffer);
     });
 
@@ -40,8 +40,9 @@ class FileForm extends React.Component {
   }
 
   showError(err) {     
-    this.setState({ error: err });
-    setTimeout(() => this.setState({ error: '' }), 5000);
+    this.setState({ error: err.message });
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.setState({ error: '' }), 5000);
   }
 
   fileUploadChange(event) {
@@ -63,41 +64,36 @@ class FileForm extends React.Component {
   }
 
   upload() {
+    if (this.state.chosen.length === 1 && this.state.chosen[0] === 'None') {
+      this.showError(new Error('Nothing selected. Select, then upload'));
+      return;
+    };
     this.setState({ token: 'loading...' });
     const list = [];
     for (const file of this.state.files) list.push(file.name);
     for (const file of this.state.files) this.transport.bufferCall(file);
-    this.transport.socketCall('file-names', { list })
+    this.transport.socketCall('upload', { list })
       .then(token => this.setState({ token }))
       .catch(this.showError);
   }
 
   getFilenames() {
+    if (this.state.input.length === 0) {
+      this.showError(new Error('Enter valid token please'));
+      return;
+    };
     this.transport.socketCall('available-files', { token: this.state.input  })
-      .then(list => {
-        let dataList = Object.keys(list);
-        this.setState({ dataList });
-      })
+      .then(dataList => this.setState({ dataList }))
       .catch(this.showError);
   }
 
-  downloadFromLink(event) {
+  download(event) {
+    const files = event.target.innerText === 'Download All'
+      ? this.state.dataList
+      : [event.target.innerText]
     this.transport.socketCall('download', { 
-      token: this.state.input, 
-      files: [event.target.innerText]  
-    })
-    .then(files => { 
-      for (let i = 0; i < files.length; i++) 
-        downloadFile(files[i], this.buffers[i]); 
-      this.buffers = [];
-    })
-    .catch(this.showError);
-  }
-
-  download() {
-    this.transport.socketCall('download', { 
-      token: this.state.input, 
-      files: this.state.dataList
+      token: this.state.input.trim(), 
+      files
     })
     .then(files => { 
       for (let i = 0; i < files.length; i++) 
@@ -129,7 +125,6 @@ class FileForm extends React.Component {
           chosen = { this.state.chosen }
           upload = { this.upload }
           download = { this.download }
-          downloadFromLink = { this.downloadFromLink }
           input = { this.state.input }
           tokenInputChange = { this.tokenInputChange }
           fileSelect = { this.fileSelect }
@@ -138,6 +133,7 @@ class FileForm extends React.Component {
           fileList = { this.state.dataList }
           error = { this.state.error }
         />
+        <h1 className="error-box">{this.state.error}</h1>
       </div>
     );
   }

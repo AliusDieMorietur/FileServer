@@ -80,7 +80,7 @@ let Tab = function (_React$Component) {
 						},
 						React.createElement(
 							'a',
-							{ download: el, onClick: this.props.downloadFromLink, __self: this,
+							{ download: el, onClick: this.props.download, __self: this,
 								__source: {
 									fileName: _jsxFileName,
 									lineNumber: 16
@@ -205,26 +205,15 @@ let Tab = function (_React$Component) {
 				downloadButton
 			);
 
-			let tab = this.props.tab === 'upload' ? uploadTab : downloadTab;
 			return React.createElement(
 				'div',
 				{ className: 'tabulator', __self: this,
 					__source: {
 						fileName: _jsxFileName,
-						lineNumber: 43
+						lineNumber: 42
 					}
 				},
-				tab,
-				React.createElement(
-					'h1',
-					{ className: 'error-box', __self: this,
-						__source: {
-							fileName: _jsxFileName,
-							lineNumber: 45
-						}
-					},
-					this.props.error
-				)
+				this.props.tab === 'upload' ? uploadTab : downloadTab
 			);
 		}
 	}]);
