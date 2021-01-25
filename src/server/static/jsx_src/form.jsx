@@ -1,7 +1,5 @@
 const downloadFile = (name, dataBlob) => {
-  const newBlob = new Blob([dataBlob.data]);
-  const blobUrl = window.URL.createObjectURL(newBlob);
-  // TODO: probably possible to refactor that shit into proper links
+  const blobUrl = window.URL.createObjectURL(dataBlob);
   const link = document.createElement('a');
   link.href = blobUrl;
   link.setAttribute('download', name);
