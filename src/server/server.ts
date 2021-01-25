@@ -1,5 +1,4 @@
-import { App } from './lib/app';
+import { Launcher } from './lib/launcher';
 
-const myApp = new App();
-console.log();
-myApp.start();
+const app = new Launcher();
+app.start()

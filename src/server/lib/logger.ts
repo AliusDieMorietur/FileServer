@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { format } from 'util';
+import { threadId } from 'worker_threads';
 
 type LogLevel = 'info' | 'error' | 'warning' | 'success' | 'ext'
 
@@ -21,7 +22,7 @@ class Logger {
     const now = new Date().toISOString();
     const date = now.substring(0, DATETIME_LENGTH);
     const color = COLORS[level];
-    const line = date + '\t' + s + '\n';
+    const line = `${date} [${level}] W${threadId}${s}\n`;
 
     console.log(color + line + '\x1b[0m');
     this.stream.write(line);
