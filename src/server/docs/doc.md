@@ -1,6 +1,7 @@
 # Logger
 * Simple logger, stored in <code>App</code> class and used across all application. 
   Shows time, date, worker and message
+  
 | property / method | definition |
 | - | - |
 | private stream | any |
@@ -12,6 +13,7 @@
 
 # App
 * Prepare all required files and have methods to manage app files.
+
 | property / method | definition |
 | - | - |
 | logger | Logger |
@@ -29,6 +31,7 @@
 
 # Channel
 * Handles connections and messages.
+
 | property / method | definition |
 | - | - |
 | private application | App |
@@ -42,6 +45,7 @@
 
 # Client
 * Handles static.
+
 | property / method | definition |
 | - | - |
 | private req | any |
@@ -52,6 +56,7 @@
 
 # Launcher
 * Create Workers to have more than one instance of server.
+
 | property / method | definition |
 | - | - |
 | count | number |
@@ -62,6 +67,7 @@
 
 # Server
 * Creates ws server. Use <code>Channel and Client</code> classes.
+
 | property / method | definition |
 | - | - |
 | application | App |
@@ -72,6 +78,7 @@
 
 # Database
 * Not used yet. Should connect to PostgreSQL and manage data.
+
 | property / method | definition |
 | - | - |
 | private pool | Pool |
