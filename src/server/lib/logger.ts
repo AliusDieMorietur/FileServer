@@ -14,7 +14,7 @@ const COLORS: { [k in LogLevel]: string } = {
 
 const DATETIME_LENGTH = 19;
 
-class Logger { 
+export class Logger { 
   private stream = fs.createWriteStream('./logs/log.txt', { flags: 'a' })
 
   private write(level: LogLevel, ...args: string[]) {
@@ -22,7 +22,7 @@ class Logger {
     const now = new Date().toISOString();
     const date = now.substring(0, DATETIME_LENGTH);
     const color = COLORS[level];
-    const line = `${date} [${level}] W${threadId}${s}\n`;
+    const line = `${date} W${threadId} [${level}]${s}\n`;
 
     console.log(color + line + '\x1b[0m');
     this.stream.write(line);
@@ -44,5 +44,3 @@ class Logger {
     this.write('ext', ...args);
   }
 }
-
-export const logger = new Logger();

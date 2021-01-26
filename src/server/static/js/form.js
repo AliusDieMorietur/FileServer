@@ -9,9 +9,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 const downloadFile = (name, dataBlob) => {
-  console.log('d', dataBlob);
-  const newBlob = new Blob([dataBlob.data]);
-  console.log('n', newBlob);
   const blobUrl = window.URL.createObjectURL(dataBlob);
   const link = document.createElement('a');
   link.href = blobUrl;
@@ -128,7 +125,7 @@ let FileForm = function (_React$Component) {
         { className: 'form', __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 109
+            lineNumber: 106
           }
         },
         React.createElement(
@@ -136,7 +133,7 @@ let FileForm = function (_React$Component) {
           { className: 'tabs', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 110
+              lineNumber: 107
             }
           },
           React.createElement(
@@ -146,7 +143,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'upload' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 111
+                lineNumber: 108
               }
             },
             'Upload'
@@ -158,7 +155,7 @@ let FileForm = function (_React$Component) {
               onClick: () => this.setState({ tab: 'download' }), __self: this,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 116
+                lineNumber: 113
               }
             },
             'Download'
@@ -181,7 +178,7 @@ let FileForm = function (_React$Component) {
           __self: this,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 122
+            lineNumber: 119
           }
         }),
         React.createElement(
@@ -189,7 +186,7 @@ let FileForm = function (_React$Component) {
           { className: 'error-box', __self: this,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 137
+              lineNumber: 134
             }
           },
           this.state.error

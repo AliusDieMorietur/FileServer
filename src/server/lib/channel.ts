@@ -1,27 +1,23 @@
-import * as ws from 'ws';
 import * as path from 'path';
 import { promises as fsp } from 'fs';
 import { generateToken } from './auth';
 import { serverConfig } from '../config/server';
 
-const STORAGE_PATH = path.join(process.cwd(), './storage/');
-const TOKEN_LIFE_TIME = serverConfig.tokenLifeTime;
-
-const fileTimeout = async (path, time) => 
-  setTimeout(() => fsp.unlink(path), time);
+const STORAGE_PATH: string = path.join(process.cwd(), './storage/');
+const TOKEN_LIFE_TIME: number = serverConfig.tokenLifeTime;
 
 export class Channel {
   private application;
-  private connection: ws;
+  private connection;
   private token: string;
   private buffers: Buffer[] = [];
   private actions: object;
 
-  constructor(connection: ws, application) {
+  constructor(connection, application) {
     this.connection = connection;
     this.application = application;
     this.actions = {
-      'upload': async (call, args) => {
+      'upload': async (call: number, args) => {
         const { list } = args;
         this.token = generateToken();
         const dirPath = path.join(STORAGE_PATH, this.token);
@@ -51,7 +47,7 @@ export class Channel {
         this.buffers = [];
         this.send(JSON.stringify({ callId: call, result: this.token }));
       },
-      'available-files': async (call, args) => {
+      'available-files': async (call: number, args) => {
         const { token } = args;
         try {
           const info = await this.application.getInfo(token);

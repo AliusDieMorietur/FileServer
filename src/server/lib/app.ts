@@ -1,13 +1,11 @@
-import { dir } from 'console';
-import * as fs from 'fs';
-import { promises as fsp } from 'fs';
+import { promises as fsp, Dirent } from 'fs';
 import * as path from 'path';
-import { logger } from './logger';
+import { Logger } from './logger';
 
 const STATIC_PATH = path.join(process.cwd(), './static');
 const STORAGE_PATH = path.join(process.cwd(), './storage/');
 
-const toUnix = filePath => 
+const toUnix = (filePath: string): string => 
   process.platform === 'win32' 
     ? filePath
       .split(path.sep)
@@ -15,19 +13,19 @@ const toUnix = filePath =>
     : filePath;
 
 export class App {
-  logger = logger;
+  logger = new Logger();
   static = new Map();
 
   getStatic(filePath: string): Buffer {
     return this.static.get(filePath);
   }
 
-  async getInfo(token) {
+  async getInfo(token: string): Promise<object> {
     const info = await fsp.readFile(path.join(STORAGE_PATH, token + '_info.json'));
     return JSON.parse(info.toString()).savedNames;
   }
 
-  async folderTimeout(folderPath, time) {
+  async folderTimeout(folderPath: string, time: number) {
     setTimeout(async () => {
       await fsp.unlink(folderPath + '_info.json');
       await fsp.rmdir(folderPath, { recursive: true });
@@ -37,7 +35,7 @@ export class App {
   async clearExpired() {
     try {
       let count = 0;
-      const list = await fsp.readdir(STORAGE_PATH, { withFileTypes: true });
+      const list: Dirent[] = await fsp.readdir(STORAGE_PATH, { withFileTypes: true });
       for (const item of list) {
         if (item.isFile()) {
           const filePath = path.join(STORAGE_PATH, item.name);
@@ -72,7 +70,7 @@ export class App {
 
   async loadDirectory(dirPath: string) {
     try {
-      const files = await fsp.readdir(dirPath, { withFileTypes: true });
+      const files: Dirent[] = await fsp.readdir(dirPath, { withFileTypes: true });
       for (const file of files) {
         if (file.name.startsWith('.')) continue;
         const filePath = path.join(dirPath, file.name);

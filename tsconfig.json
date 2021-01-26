@@ -3,10 +3,11 @@
     "incremental": true,
     "target": "esnext",
     "module": "commonjs",
+    "declaration": true,
     "removeComments": true,
-    "outDir": "target/server",
+    "outDir": "target/server"
   },
   "include": [
     "./src/server"
-  ]
+  ] 
 }

@@ -5,7 +5,7 @@ import { serverConfig } from '../config/server';
 import { Client } from './client';
 import { Channel } from './channel';
 
-const createServer = application => {
+const createServer = (application): http.Server => {
 	const listener = (req: http.IncomingMessage, res) => {
 		const [domen, command] = req.url.substring(1).split('/');
 		if (domen === 'api') { 
@@ -20,8 +20,8 @@ const createServer = application => {
 
 export class Server {
 	application;
-  instance;
-  ws;
+  instance: http.Server;
+  ws: ws.Server;
 
   constructor(application) {
 		this.application = application;

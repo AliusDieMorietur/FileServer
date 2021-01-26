@@ -11,9 +11,9 @@ const MIME_TYPES = {
 };
 
 export class Client {
-  private req
-  private res
-  private application
+  private req;
+  private res;
+  private application;
 
   constructor(req, res, application) {
     this.req = req;

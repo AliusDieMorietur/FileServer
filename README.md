@@ -1,6 +1,6 @@
 # FileServer
-Simple file server dedicated for easily exchange of information between devices.
-Server - node js, file system addon - rust, database - PostgreSQL, client - React, client for android - Kotlin.
+Simple file server dedicated for easily exchange of information between devices.ко
+Server - Node.js (Typescript), file system addon - rust(future), database - PostgreSQL(future), client - React.js, client for android - Kotlin(future).
 
 # Requirements
 * NodeJS 12^
@@ -9,7 +9,7 @@ Server - node js, file system addon - rust, database - PostgreSQL, client - Reac
 # Install
 * Clone repo with `git clone`. 
 * Run `npm i` and `npm start` to start server and stuff.
-* PROFIT!!!
+* Go to localhost:<code>7000 | 7001 | 7002 | 7003 </code>
 
 # Dependencies
 * pg: ^8.5.0

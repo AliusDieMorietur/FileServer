@@ -1,13 +1,13 @@
 import { Pool } from 'pg';
 
 class Database {
-  private pool;
+  private pool: Pool;
 
   constructor(config) {
     this.pool = new Pool(config);
   }
 
-  query(sql, values?) {
+  query(sql: string, values?) {
     return this.pool.query(sql, values);
   }
 
