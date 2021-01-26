@@ -1,5 +1,5 @@
 # FileServer
-Simple file server dedicated for easily exchange of information between devices.ко
+Simple file server dedicated for easily exchange of information between devices
 Server - Node.js (Typescript), file system addon - rust(future), database - PostgreSQL(future), client - React.js, client for android - Kotlin(future).
 
 # Requirements
