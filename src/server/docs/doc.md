@@ -1,6 +1,6 @@
 # Logger
 * Simple logger, stored in <code>App</code> class and used across all application. 
-  Shows time, date, worker and message
+  Shows time, date, worker and message.
   
 | property / method | definition |
 | - | - |
